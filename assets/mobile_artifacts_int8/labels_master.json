@@ -1,0 +1,57 @@
+{
+  "version": "sprint1-labels-v1",
+  "classes": [
+    {
+      "index": 0,
+      "landmark_id": "bohyunsanshingak"
+    },
+    {
+      "index": 1,
+      "landmark_id": "changgyeonggung"
+    },
+    {
+      "index": 2,
+      "landmark_id": "cheonggyecheon"
+    },
+    {
+      "index": 3,
+      "landmark_id": "cheongwadae"
+    },
+    {
+      "index": 4,
+      "landmark_id": "deoksugung"
+    },
+    {
+      "index": 5,
+      "landmark_id": "gwanghwamun"
+    },
+    {
+      "index": 6,
+      "landmark_id": "gyeongbokgung_geunjeongmun"
+    },
+    {
+      "index": 7,
+      "landmark_id": "jogyesa"
+    },
+    {
+      "index": 8,
+      "landmark_id": "jongmyo_shrine"
+    },
+    {
+      "index": 9,
+      "landmark_id": "mmca_seoul"
+    },
+    {
+      "index": 10,
+      "landmark_id": "myeongdong_cathedral"
+    },
+    {
+      "index": 11,
+      "landmark_id": "naksan_park"
+    },
+    {
+      "index": 12,
+      "landmark_id": "statue_of_king_sejong"
+    }
+  ]
+}

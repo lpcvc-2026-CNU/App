@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "landmark_id": "gyeongbokgung_geunjeongmun",
+      "name_ko": "경복궁 근정문",
+      "name_en": "Gyeongbokgung Geunjeongmun",
+      "description_ko": "종로구에 위치한 조선 시대 궁궐의 정문입니다.",
+      "latitude": 37.5779,
+      "longitude": 126.9768,
+      "aliases": ["경복궁", "근정문"]
+    },
+    {
+      "landmark_id": "myeongdong_cathedral",
+      "name_ko": "명동성당",
+      "name_en": "Myeongdong Cathedral",
+      "description_ko": "중구에 위치한 한국 천주교의 중심 성당입니다.",
+      "latitude": 37.5631,
+      "longitude": 126.9873,
+      "aliases": ["명동성당", "명동 대성당"]
+    },
+    {
+      "landmark_id": "changgyeonggung",
+      "name_ko": "창경궁",
+      "name_en": "Changgyeonggung",
+      "description_ko": "종로구에 위치한 조선의 궁궐 중 하나입니다.",
+      "latitude": 37.5788,
+      "longitude": 126.9948,
+      "aliases": ["창경궁"]
+    }
+  ]
+}

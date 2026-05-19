@@ -1,0 +1,23 @@
+{
+  "version": "sprint1-mobile-int8-v1",
+  "source_bundle": "D:\\landmark-demo-artifacts\\mobile_artifacts",
+  "source_total_mb": 1233.16,
+  "quant_settings": {
+    "method": "dynamic",
+    "weight_type": "QInt8",
+    "per_channel": true,
+    "reduce_range": false,
+    "op_types_to_quantize": [
+      "MatMul",
+      "Gemm"
+    ]
+  },
+  "destination_onnx": "D:\\landmark-demo-artifacts\\mobile_artifacts_int8\\landmark_encoder.onnx",
+  "onnx_file_mb": 4.3,
+  "onnx_external_data_mb": 978.72,
+  "onnx_total_mb": 983.02,
+  "compression_ratio": 1.254,
+  "notes": [
+    "prototype_index.json is copied from the FP32 bundle; rebuild with build_assets.py against the INT8 model only if cosine drift is material in the regression report."
+  ]
+}

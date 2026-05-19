@@ -1,0 +1,1193 @@
+{
+  "version": "sprint1-quant-regression-v1",
+  "fp32_bundle": "D:\\landmark-demo-artifacts\\mobile_artifacts",
+  "int8_bundle": "D:\\landmark-demo-artifacts\\mobile_artifacts_int8",
+  "policy": {
+    "reject_threshold": 0.25,
+    "weak_reject_threshold": 0.35,
+    "weak_margin": 0.12,
+    "match_threshold": 0.6,
+    "match_floor": 0.5,
+    "match_margin": 0.2,
+    "isolated_match_threshold": 0.4,
+    "isolated_match_margin": 0.3,
+    "isolated_match_top2_max": 0.1
+  },
+  "aggregate": {
+    "n_images": 15,
+    "top1_agreement_rate": 1.0,
+    "top3_exact_match_rate": 0.8666666666666667,
+    "top3_set_match_rate": 0.8666666666666667,
+    "decision_agreement_rate": 1.0,
+    "embedding_cosine_mean": 0.99942,
+    "embedding_cosine_min": 0.99897,
+    "delta_top1_score_abs_mean": 0.00142,
+    "delta_margin_abs_mean": 0.00232
+  },
+  "latency": {
+    "fp32_warm_median_ms": 684.13,
+    "int8_warm_median_ms": 658.95,
+    "fp32_warm_p90_ms": 761.72,
+    "int8_warm_p90_ms": 720.65,
+    "fp32_cold_median_ms": 698.27,
+    "int8_cold_median_ms": 650.26,
+    "speedup_warm_x": 1.038
+  },
+  "sizes_mb": {
+    "fp32": {
+      "onnx_file_mb": 4.28,
+      "onnx_external_data_mb": 1228.88,
+      "onnx_total_mb": 1233.16
+    },
+    "int8": {
+      "onnx_file_mb": 4.3,
+      "onnx_external_data_mb": 978.72,
+      "onnx_total_mb": 983.02
+    },
+    "compression_ratio": 1.254
+  },
+  "fixture_regression": {
+    "available": true,
+    "summary": {
+      "fp32": {
+        "n_cases": 15,
+        "top1_pass_rate": 1.0,
+        "decision_pass_rate": 1.0
+      },
+      "int8": {
+        "n_cases": 15,
+        "top1_pass_rate": 1.0,
+        "decision_pass_rate": 1.0
+      }
+    },
+    "cases": {
+      "fp32": [
+        {
+          "id": "positive-bohyunsanshingak",
+          "input_hint": "assets/regression_inputs/positive/bohyunsanshingak.jpg",
+          "expected_top1": "bohyunsanshingak",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "bohyunsanshingak",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-changgyeonggung",
+          "input_hint": "assets/regression_inputs/positive/changgyeonggung.jpg",
+          "expected_top1": "changgyeonggung",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "changgyeonggung",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-cheonggyecheon",
+          "input_hint": "assets/regression_inputs/positive/cheonggyecheon.jpg",
+          "expected_top1": "cheonggyecheon",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "cheonggyecheon",
+          "actual_decision": "matched",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-cheongwadae",
+          "input_hint": "assets/regression_inputs/positive/cheongwadae.jpg",
+          "expected_top1": "cheongwadae",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "cheongwadae",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-deoksugung",
+          "input_hint": "assets/regression_inputs/positive/deoksugung.jpg",
+          "expected_top1": "deoksugung",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "deoksugung",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-gwanghwamun",
+          "input_hint": "assets/regression_inputs/positive/gwanghwamun.jpg",
+          "expected_top1": "gwanghwamun",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "gwanghwamun",
+          "actual_decision": "matched",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-gyeongbokgung_geunjeongmun",
+          "input_hint": "assets/regression_inputs/positive/gyeongbokgung_geunjeongmun.jpg",
+          "expected_top1": "gyeongbokgung_geunjeongmun",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "gyeongbokgung_geunjeongmun",
+          "actual_decision": "matched",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-jogyesa",
+          "input_hint": "assets/regression_inputs/positive/jogyesa.jpg",
+          "expected_top1": "jogyesa",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "jogyesa",
+          "actual_decision": "matched",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-jongmyo_shrine",
+          "input_hint": "assets/regression_inputs/positive/jongmyo_shrine.jpg",
+          "expected_top1": "jongmyo_shrine",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "jongmyo_shrine",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-mmca_seoul",
+          "input_hint": "assets/regression_inputs/positive/mmca_seoul.jpg",
+          "expected_top1": "mmca_seoul",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "mmca_seoul",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-myeongdong_cathedral",
+          "input_hint": "assets/regression_inputs/positive/myeongdong_cathedral.jpg",
+          "expected_top1": "myeongdong_cathedral",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "myeongdong_cathedral",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-naksan_park",
+          "input_hint": "assets/regression_inputs/positive/naksan_park.jpg",
+          "expected_top1": "naksan_park",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "naksan_park",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-statue_of_king_sejong",
+          "input_hint": "assets/regression_inputs/positive/statue_of_king_sejong.jpg",
+          "expected_top1": "statue_of_king_sejong",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "statue_of_king_sejong",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "out-of-scope-screen-capture-synthetic",
+          "input_hint": "assets/regression_inputs/out_of_scope/screen_capture_synthetic.png",
+          "expected_top1": null,
+          "expected_decision": "out_of_scope",
+          "actual_top1": "mmca_seoul",
+          "actual_decision": "out_of_scope",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "out-of-scope-uniform-noise",
+          "input_hint": "assets/regression_inputs/out_of_scope/uniform_noise.jpg",
+          "expected_top1": null,
+          "expected_decision": "out_of_scope",
+          "actual_top1": "naksan_park",
+          "actual_decision": "out_of_scope",
+          "top1_pass": true,
+          "decision_pass": true
+        }
+      ],
+      "int8": [
+        {
+          "id": "positive-bohyunsanshingak",
+          "input_hint": "assets/regression_inputs/positive/bohyunsanshingak.jpg",
+          "expected_top1": "bohyunsanshingak",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "bohyunsanshingak",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-changgyeonggung",
+          "input_hint": "assets/regression_inputs/positive/changgyeonggung.jpg",
+          "expected_top1": "changgyeonggung",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "changgyeonggung",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-cheonggyecheon",
+          "input_hint": "assets/regression_inputs/positive/cheonggyecheon.jpg",
+          "expected_top1": "cheonggyecheon",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "cheonggyecheon",
+          "actual_decision": "matched",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-cheongwadae",
+          "input_hint": "assets/regression_inputs/positive/cheongwadae.jpg",
+          "expected_top1": "cheongwadae",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "cheongwadae",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-deoksugung",
+          "input_hint": "assets/regression_inputs/positive/deoksugung.jpg",
+          "expected_top1": "deoksugung",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "deoksugung",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-gwanghwamun",
+          "input_hint": "assets/regression_inputs/positive/gwanghwamun.jpg",
+          "expected_top1": "gwanghwamun",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "gwanghwamun",
+          "actual_decision": "matched",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-gyeongbokgung_geunjeongmun",
+          "input_hint": "assets/regression_inputs/positive/gyeongbokgung_geunjeongmun.jpg",
+          "expected_top1": "gyeongbokgung_geunjeongmun",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "gyeongbokgung_geunjeongmun",
+          "actual_decision": "matched",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-jogyesa",
+          "input_hint": "assets/regression_inputs/positive/jogyesa.jpg",
+          "expected_top1": "jogyesa",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "jogyesa",
+          "actual_decision": "matched",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-jongmyo_shrine",
+          "input_hint": "assets/regression_inputs/positive/jongmyo_shrine.jpg",
+          "expected_top1": "jongmyo_shrine",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "jongmyo_shrine",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-mmca_seoul",
+          "input_hint": "assets/regression_inputs/positive/mmca_seoul.jpg",
+          "expected_top1": "mmca_seoul",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "mmca_seoul",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-myeongdong_cathedral",
+          "input_hint": "assets/regression_inputs/positive/myeongdong_cathedral.jpg",
+          "expected_top1": "myeongdong_cathedral",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "myeongdong_cathedral",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-naksan_park",
+          "input_hint": "assets/regression_inputs/positive/naksan_park.jpg",
+          "expected_top1": "naksan_park",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "naksan_park",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "positive-statue_of_king_sejong",
+          "input_hint": "assets/regression_inputs/positive/statue_of_king_sejong.jpg",
+          "expected_top1": "statue_of_king_sejong",
+          "expected_decision": [
+            "matched",
+            "ambiguous"
+          ],
+          "actual_top1": "statue_of_king_sejong",
+          "actual_decision": "ambiguous",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "out-of-scope-screen-capture-synthetic",
+          "input_hint": "assets/regression_inputs/out_of_scope/screen_capture_synthetic.png",
+          "expected_top1": null,
+          "expected_decision": "out_of_scope",
+          "actual_top1": "mmca_seoul",
+          "actual_decision": "out_of_scope",
+          "top1_pass": true,
+          "decision_pass": true
+        },
+        {
+          "id": "out-of-scope-uniform-noise",
+          "input_hint": "assets/regression_inputs/out_of_scope/uniform_noise.jpg",
+          "expected_top1": null,
+          "expected_decision": "out_of_scope",
+          "actual_top1": "naksan_park",
+          "actual_decision": "out_of_scope",
+          "top1_pass": true,
+          "decision_pass": true
+        }
+      ]
+    }
+  },
+  "records": [
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\bohyunsanshingak.jpg",
+      "embedding_cosine": 0.9996306896209717,
+      "embedding_l2_diff": 0.027177700772881508,
+      "fp32": {
+        "top3": [
+          "bohyunsanshingak",
+          "cheonggyecheon",
+          "jogyesa"
+        ],
+        "top1": "bohyunsanshingak",
+        "top1_score": 0.3534368574619293,
+        "margin": 0.363478010520339,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 685.17,
+        "warm_p90_ms": 701.82,
+        "cold_ms": 784.4
+      },
+      "int8": {
+        "top3": [
+          "bohyunsanshingak",
+          "cheonggyecheon",
+          "jogyesa"
+        ],
+        "top1": "bohyunsanshingak",
+        "top1_score": 0.3551153838634491,
+        "margin": 0.3665195321664214,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 667.84,
+        "warm_p90_ms": 676.04,
+        "cold_ms": 929.52
+      },
+      "delta": {
+        "top1_score": 0.00168,
+        "margin": 0.00304
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\changgyeonggung.jpg",
+      "embedding_cosine": 0.9995015263557434,
+      "embedding_l2_diff": 0.03157461807131767,
+      "fp32": {
+        "top3": [
+          "changgyeonggung",
+          "naksan_park",
+          "gwanghwamun"
+        ],
+        "top1": "changgyeonggung",
+        "top1_score": 0.3648526668548584,
+        "margin": 0.35575706139206886,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 742.26,
+        "warm_p90_ms": 799.3,
+        "cold_ms": 701.52
+      },
+      "int8": {
+        "top3": [
+          "changgyeonggung",
+          "naksan_park",
+          "gwanghwamun"
+        ],
+        "top1": "changgyeonggung",
+        "top1_score": 0.3666015863418579,
+        "margin": 0.36033271066844463,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 719.48,
+        "warm_p90_ms": 812.41,
+        "cold_ms": 638.68
+      },
+      "delta": {
+        "top1_score": 0.00175,
+        "margin": 0.00458
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\cheonggyecheon.jpg",
+      "embedding_cosine": 0.9994022846221924,
+      "embedding_l2_diff": 0.034575726836919785,
+      "fp32": {
+        "top3": [
+          "cheonggyecheon",
+          "statue_of_king_sejong",
+          "deoksugung"
+        ],
+        "top1": "cheonggyecheon",
+        "top1_score": 0.4717869162559509,
+        "margin": 0.459569551050663,
+        "decision": "matched",
+        "reason_codes": [
+          "top1_isolated",
+          "top2_very_low"
+        ],
+        "warm_median_ms": 671.72,
+        "warm_p90_ms": 704.56,
+        "cold_ms": 651.98
+      },
+      "int8": {
+        "top3": [
+          "cheonggyecheon",
+          "statue_of_king_sejong",
+          "deoksugung"
+        ],
+        "top1": "cheonggyecheon",
+        "top1_score": 0.4706548750400543,
+        "margin": 0.4596952870488167,
+        "decision": "matched",
+        "reason_codes": [
+          "top1_isolated",
+          "top2_very_low"
+        ],
+        "warm_median_ms": 655.1,
+        "warm_p90_ms": 708.56,
+        "cold_ms": 678.23
+      },
+      "delta": {
+        "top1_score": -0.00113,
+        "margin": 0.00013
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\cheongwadae.jpg",
+      "embedding_cosine": 0.9995092153549194,
+      "embedding_l2_diff": 0.0313342809677124,
+      "fp32": {
+        "top3": [
+          "cheongwadae",
+          "statue_of_king_sejong",
+          "cheonggyecheon"
+        ],
+        "top1": "cheongwadae",
+        "top1_score": 0.38007235527038574,
+        "margin": 0.36753166001290083,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 698.36,
+        "warm_p90_ms": 761.72,
+        "cold_ms": 651.73
+      },
+      "int8": {
+        "top3": [
+          "cheongwadae",
+          "statue_of_king_sejong",
+          "cheonggyecheon"
+        ],
+        "top1": "cheongwadae",
+        "top1_score": 0.37946921586990356,
+        "margin": 0.36828931514173746,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 697.33,
+        "warm_p90_ms": 720.65,
+        "cold_ms": 637.84
+      },
+      "delta": {
+        "top1_score": -0.0006,
+        "margin": 0.00076
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\deoksugung.jpg",
+      "embedding_cosine": 0.9994086623191833,
+      "embedding_l2_diff": 0.034388668835163116,
+      "fp32": {
+        "top3": [
+          "deoksugung",
+          "cheonggyecheon",
+          "gwanghwamun"
+        ],
+        "top1": "deoksugung",
+        "top1_score": 0.39195677638053894,
+        "margin": 0.3980065304785967,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 744.04,
+        "warm_p90_ms": 799.8,
+        "cold_ms": 698.27
+      },
+      "int8": {
+        "top3": [
+          "deoksugung",
+          "cheonggyecheon",
+          "gyeongbokgung_geunjeongmun"
+        ],
+        "top1": "deoksugung",
+        "top1_score": 0.3917258083820343,
+        "margin": 0.39832865074276924,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 627.43,
+        "warm_p90_ms": 646.46,
+        "cold_ms": 630.65
+      },
+      "delta": {
+        "top1_score": -0.00023,
+        "margin": 0.00032
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": false,
+        "top3_set": false,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\gwanghwamun.jpg",
+      "embedding_cosine": 0.9991435408592224,
+      "embedding_l2_diff": 0.04138815775513649,
+      "fp32": {
+        "top3": [
+          "gwanghwamun",
+          "cheonggyecheon",
+          "statue_of_king_sejong"
+        ],
+        "top1": "gwanghwamun",
+        "top1_score": 0.4654526114463806,
+        "margin": 0.39566250145435333,
+        "decision": "matched",
+        "reason_codes": [
+          "top1_isolated",
+          "top2_very_low"
+        ],
+        "warm_median_ms": 666.14,
+        "warm_p90_ms": 668.55,
+        "cold_ms": 660.57
+      },
+      "int8": {
+        "top3": [
+          "gwanghwamun",
+          "cheonggyecheon",
+          "statue_of_king_sejong"
+        ],
+        "top1": "gwanghwamun",
+        "top1_score": 0.46633583307266235,
+        "margin": 0.4005913510918617,
+        "decision": "matched",
+        "reason_codes": [
+          "top1_isolated",
+          "top2_very_low"
+        ],
+        "warm_median_ms": 619.21,
+        "warm_p90_ms": 626.75,
+        "cold_ms": 647.29
+      },
+      "delta": {
+        "top1_score": 0.00088,
+        "margin": 0.00493
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\gyeongbokgung_geunjeongmun.jpg",
+      "embedding_cosine": 0.9989733695983887,
+      "embedding_l2_diff": 0.045313406735658646,
+      "fp32": {
+        "top3": [
+          "gyeongbokgung_geunjeongmun",
+          "gwanghwamun",
+          "jogyesa"
+        ],
+        "top1": "gyeongbokgung_geunjeongmun",
+        "top1_score": 0.45263177156448364,
+        "margin": 0.3842487037181854,
+        "decision": "matched",
+        "reason_codes": [
+          "top1_isolated",
+          "top2_very_low"
+        ],
+        "warm_median_ms": 703.93,
+        "warm_p90_ms": 724.87,
+        "cold_ms": 669.09
+      },
+      "int8": {
+        "top3": [
+          "gyeongbokgung_geunjeongmun",
+          "gwanghwamun",
+          "jogyesa"
+        ],
+        "top1": "gyeongbokgung_geunjeongmun",
+        "top1_score": 0.4549034833908081,
+        "margin": 0.38738375902175903,
+        "decision": "matched",
+        "reason_codes": [
+          "top1_isolated",
+          "top2_very_low"
+        ],
+        "warm_median_ms": 675.87,
+        "warm_p90_ms": 687.69,
+        "cold_ms": 633.13
+      },
+      "delta": {
+        "top1_score": 0.00227,
+        "margin": 0.00314
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\jogyesa.jpg",
+      "embedding_cosine": 0.999414324760437,
+      "embedding_l2_diff": 0.034226108342409134,
+      "fp32": {
+        "top3": [
+          "jogyesa",
+          "cheonggyecheon",
+          "bohyunsanshingak"
+        ],
+        "top1": "jogyesa",
+        "top1_score": 0.41687822341918945,
+        "margin": 0.41965341847389936,
+        "decision": "matched",
+        "reason_codes": [
+          "top1_isolated",
+          "top2_very_low"
+        ],
+        "warm_median_ms": 644.7,
+        "warm_p90_ms": 676.43,
+        "cold_ms": 744.12
+      },
+      "int8": {
+        "top3": [
+          "jogyesa",
+          "bohyunsanshingak",
+          "gyeongbokgung_geunjeongmun"
+        ],
+        "top1": "jogyesa",
+        "top1_score": 0.41416043043136597,
+        "margin": 0.4146659281104803,
+        "decision": "matched",
+        "reason_codes": [
+          "top1_isolated",
+          "top2_very_low"
+        ],
+        "warm_median_ms": 669.14,
+        "warm_p90_ms": 686.62,
+        "cold_ms": 758.9
+      },
+      "delta": {
+        "top1_score": -0.00272,
+        "margin": -0.00499
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": false,
+        "top3_set": false,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\jongmyo_shrine.jpg",
+      "embedding_cosine": 0.9995176196098328,
+      "embedding_l2_diff": 0.031067494302988052,
+      "fp32": {
+        "top3": [
+          "jongmyo_shrine",
+          "gwanghwamun",
+          "cheonggyecheon"
+        ],
+        "top1": "jongmyo_shrine",
+        "top1_score": 0.3356150984764099,
+        "margin": 0.31441656686365604,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 679.65,
+        "warm_p90_ms": 689.65,
+        "cold_ms": 617.19
+      },
+      "int8": {
+        "top3": [
+          "jongmyo_shrine",
+          "gwanghwamun",
+          "cheonggyecheon"
+        ],
+        "top1": "jongmyo_shrine",
+        "top1_score": 0.3381125330924988,
+        "margin": 0.3187066502869129,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 676.89,
+        "warm_p90_ms": 695.52,
+        "cold_ms": 640.24
+      },
+      "delta": {
+        "top1_score": 0.0025,
+        "margin": 0.00429
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\mmca_seoul.jpg",
+      "embedding_cosine": 0.9994325637817383,
+      "embedding_l2_diff": 0.03368737921118736,
+      "fp32": {
+        "top3": [
+          "mmca_seoul",
+          "cheonggyecheon",
+          "gwanghwamun"
+        ],
+        "top1": "mmca_seoul",
+        "top1_score": 0.3591146469116211,
+        "margin": 0.3380594588816166,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 639.07,
+        "warm_p90_ms": 654.17,
+        "cold_ms": 757.77
+      },
+      "int8": {
+        "top3": [
+          "mmca_seoul",
+          "cheonggyecheon",
+          "gwanghwamun"
+        ],
+        "top1": "mmca_seoul",
+        "top1_score": 0.3591400980949402,
+        "margin": 0.34067215397953987,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 619.35,
+        "warm_p90_ms": 668.38,
+        "cold_ms": 594.23
+      },
+      "delta": {
+        "top1_score": 3e-05,
+        "margin": 0.00261
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\myeongdong_cathedral.jpg",
+      "embedding_cosine": 0.9996476769447327,
+      "embedding_l2_diff": 0.026545345783233643,
+      "fp32": {
+        "top3": [
+          "myeongdong_cathedral",
+          "cheonggyecheon",
+          "gyeongbokgung_geunjeongmun"
+        ],
+        "top1": "myeongdong_cathedral",
+        "top1_score": 0.38976824283599854,
+        "margin": 0.39369702339172363,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 727.98,
+        "warm_p90_ms": 744.77,
+        "cold_ms": 718.78
+      },
+      "int8": {
+        "top3": [
+          "myeongdong_cathedral",
+          "cheonggyecheon",
+          "gyeongbokgung_geunjeongmun"
+        ],
+        "top1": "myeongdong_cathedral",
+        "top1_score": 0.39123836159706116,
+        "margin": 0.39582999609410763,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 663.34,
+        "warm_p90_ms": 682.92,
+        "cold_ms": 669.88
+      },
+      "delta": {
+        "top1_score": 0.00147,
+        "margin": 0.00213
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\naksan_park.jpg",
+      "embedding_cosine": 0.9995309114456177,
+      "embedding_l2_diff": 0.030628910288214684,
+      "fp32": {
+        "top3": [
+          "naksan_park",
+          "cheonggyecheon",
+          "myeongdong_cathedral"
+        ],
+        "top1": "naksan_park",
+        "top1_score": 0.3523048758506775,
+        "margin": 0.3317485377192497,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 673.17,
+        "warm_p90_ms": 701.31,
+        "cold_ms": 720.6
+      },
+      "int8": {
+        "top3": [
+          "naksan_park",
+          "cheonggyecheon",
+          "myeongdong_cathedral"
+        ],
+        "top1": "naksan_park",
+        "top1_score": 0.35267549753189087,
+        "margin": 0.3323141746222973,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 669.87,
+        "warm_p90_ms": 708.68,
+        "cold_ms": 650.26
+      },
+      "delta": {
+        "top1_score": 0.00037,
+        "margin": 0.00057
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\positive\\statue_of_king_sejong.jpg",
+      "embedding_cosine": 0.9996203184127808,
+      "embedding_l2_diff": 0.02755904197692871,
+      "fp32": {
+        "top3": [
+          "statue_of_king_sejong",
+          "jongmyo_shrine",
+          "cheonggyecheon"
+        ],
+        "top1": "statue_of_king_sejong",
+        "top1_score": 0.35549360513687134,
+        "margin": 0.32401301711797714,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 728.31,
+        "warm_p90_ms": 775.03,
+        "cold_ms": 661.53
+      },
+      "int8": {
+        "top3": [
+          "statue_of_king_sejong",
+          "jongmyo_shrine",
+          "cheonggyecheon"
+        ],
+        "top1": "statue_of_king_sejong",
+        "top1_score": 0.3569525182247162,
+        "margin": 0.32637626118957996,
+        "decision": "ambiguous",
+        "reason_codes": [
+          "top1_below_match"
+        ],
+        "warm_median_ms": 665.99,
+        "warm_p90_ms": 743.17,
+        "cold_ms": 663.9
+      },
+      "delta": {
+        "top1_score": 0.00146,
+        "margin": 0.00236
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\out_of_scope\\screen_capture_synthetic.png",
+      "embedding_cosine": 0.9993914365768433,
+      "embedding_l2_diff": 0.03488939255475998,
+      "fp32": {
+        "top3": [
+          "mmca_seoul",
+          "cheonggyecheon",
+          "statue_of_king_sejong"
+        ],
+        "top1": "mmca_seoul",
+        "top1_score": 0.11215195059776306,
+        "margin": 0.013508513569831848,
+        "decision": "out_of_scope",
+        "reason_codes": [
+          "top1_below_reject"
+        ],
+        "warm_median_ms": 669.72,
+        "warm_p90_ms": 686.82,
+        "cold_ms": 631.27
+      },
+      "int8": {
+        "top3": [
+          "mmca_seoul",
+          "cheonggyecheon",
+          "statue_of_king_sejong"
+        ],
+        "top1": "mmca_seoul",
+        "top1_score": 0.11097308993339539,
+        "margin": 0.01342223584651947,
+        "decision": "out_of_scope",
+        "reason_codes": [
+          "top1_below_reject"
+        ],
+        "warm_median_ms": 694.43,
+        "warm_p90_ms": 758.51,
+        "cold_ms": 682.57
+      },
+      "delta": {
+        "top1_score": -0.00118,
+        "margin": -9e-05
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    },
+    {
+      "image": "C:\\Users\\hi\\Downloads\\종설_작업중\\landmark-demo-app\\assets\\regression_inputs\\out_of_scope\\uniform_noise.jpg",
+      "embedding_cosine": 0.9992244243621826,
+      "embedding_l2_diff": 0.03938824310898781,
+      "fp32": {
+        "top3": [
+          "naksan_park",
+          "jongmyo_shrine",
+          "mmca_seoul"
+        ],
+        "top1": "naksan_park",
+        "top1_score": 0.10017496347427368,
+        "margin": 0.01612071692943573,
+        "decision": "out_of_scope",
+        "reason_codes": [
+          "top1_below_reject"
+        ],
+        "warm_median_ms": 705.23,
+        "warm_p90_ms": 727.44,
+        "cold_ms": 974.02
+      },
+      "int8": {
+        "top3": [
+          "naksan_park",
+          "jongmyo_shrine",
+          "mmca_seoul"
+        ],
+        "top1": "naksan_park",
+        "top1_score": 0.09718543291091919,
+        "margin": 0.015334859490394592,
+        "decision": "out_of_scope",
+        "reason_codes": [
+          "top1_below_reject"
+        ],
+        "warm_median_ms": 626.28,
+        "warm_p90_ms": 630.91,
+        "cold_ms": 810.08
+      },
+      "delta": {
+        "top1_score": -0.00299,
+        "margin": -0.00079
+      },
+      "agreement": {
+        "top1": true,
+        "top3_exact": true,
+        "top3_set": true,
+        "decision": true
+      }
+    }
+  ]
+}

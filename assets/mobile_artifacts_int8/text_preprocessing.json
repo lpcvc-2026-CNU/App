@@ -1,0 +1,16 @@
+{
+  "version": "sprint1-text-preprocessing-v1",
+  "input_name": "input_ids",
+  "output_name": "text_embedding",
+  "context_length": 77,
+  "input_dtype": "int64",
+  "output_dim": 768,
+  "output_l2_normalized": true,
+  "tokenizer": {
+    "tokenizer_type": "open_clip_runtime",
+    "open_clip_name": "MobileCLIP2-S4",
+    "context_length": 77,
+    "note": "Runtime should call open_clip.get_tokenizer(open_clip_name)."
+  },
+  "open_clip_name": "MobileCLIP2-S4"
+}
