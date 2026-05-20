@@ -76,12 +76,45 @@ class DetailScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                /*이곳에 랜드마크에 대한 개요를 기재해주세요*/
-                _buildPlaceholderSection(
-                  title: 'Overview',
-                  hint: '간단한 소개와 핵심 설명을 넣는 영역',
-                  comment: '/*이곳에 랜드마크에 대한 개요를 기재해주세요*/',
-                ),
+                if (data['description_ko'] != null || data['description_en'] != null)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: Colors.white12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Overview',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          (data['description_ko'] ?? data['description_en']).toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  /*이곳에 랜드마크에 대한 개요를 기재해주세요*/
+                  _buildPlaceholderSection(
+                    title: 'Overview',
+                    hint: '간단한 소개와 핵심 설명을 넣는 영역',
+                    comment: '/*이곳에 랜드마크에 대한 개요를 기재해주세요*/',
+                  ),
                 /*이곳에 랜드마크에 대한 역사 정보를 기재해주세요*/
                 _buildPlaceholderSection(
                   title: 'History',
@@ -125,7 +158,7 @@ class DetailScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: Colors.white12),
       ),

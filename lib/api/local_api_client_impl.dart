@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
@@ -58,7 +57,9 @@ class LocalApiClientImpl implements LocalApiClient {
   /// L2 정규화
   List<double> _l2Normalize(List<double> v) {
     double norm = 0.0;
-    for (final x in v) norm += x * x;
+    for (final x in v) {
+      norm += x * x;
+    }
     norm = sqrt(norm);
     if (norm < 1e-12) return v;
     return v.map((x) => x / norm).toList();
@@ -67,7 +68,9 @@ class LocalApiClientImpl implements LocalApiClient {
   /// Python _cosine_to_matrix 와 동일: 임베딩과 각 프로토타입의 내적 (L2-정규화 가정)
   double _dotProduct(List<double> a, List<double> b) {
     double s = 0.0;
-    for (int i = 0; i < a.length; i++) s += a[i] * b[i];
+    for (int i = 0; i < a.length; i++) {
+      s += a[i] * b[i];
+    }
     return s;
   }
 

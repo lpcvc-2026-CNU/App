@@ -121,7 +121,7 @@ class _ResultScreenState extends State<ResultScreen> {
           ),
           if (_isAnalyzing)
             Container(
-              color: Colors.black.withOpacity(0.7),
+              color: Colors.black.withValues(alpha: 0.7),
               child: const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -206,17 +206,14 @@ class _ResultScreenState extends State<ResultScreen> {
       builder: (context, snapshot) {
         final data = snapshot.data ?? {};
         final name = (data['name_ko'] ?? data['name_en'] ?? landmarkId).toString();
-        final desc = (data['description_ko'] ??
-                data['description_en'] ??
-                'Description is not available yet.')
-            .toString();
+        final desc = data['description_ko']?.toString() ?? data['description_en']?.toString();
 
         return GestureDetector(
           onTap: widget.apiClient == null ? null : () => _openDetail(landmarkId),
           child: Container(
             margin: const EdgeInsets.only(bottom: 18),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.white12),
             ),
@@ -256,7 +253,7 @@ class _ResultScreenState extends State<ResultScreen> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.55),
+                          color: Colors.black.withValues(alpha: 0.55),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
@@ -283,16 +280,18 @@ class _ResultScreenState extends State<ResultScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        desc,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          height: 1.5,
+                      if (desc != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          desc,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            height: 1.5,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
