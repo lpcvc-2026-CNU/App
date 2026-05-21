@@ -102,7 +102,7 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
               padding: const EdgeInsets.all(16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
@@ -197,7 +197,7 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
           child: Container(
             margin: const EdgeInsets.only(bottom: 18),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.white12),
             ),
@@ -261,15 +261,15 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
   }
 
   Widget _buildOutOfScopeState() {
-    return Center(
+    return const Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.search_off, size: 80, color: Colors.white24),
-            const SizedBox(height: 24),
-            const Text(
+            Icon(Icons.search_off, size: 80, color: Colors.white24),
+            SizedBox(height: 24),
+            Text(
               'No matching landmark was found.',
               style: TextStyle(
                 color: Colors.white,
@@ -277,8 +277,8 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
-            const Text(
+            SizedBox(height: 12),
+            Text(
               'Try a different keyword or landmark name.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white54, fontSize: 15),

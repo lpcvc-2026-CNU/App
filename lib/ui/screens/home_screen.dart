@@ -192,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildScanningOverlay() {
     return Container(
-      color: Colors.black.withOpacity(0.7),
+      color: Colors.black.withValues(alpha: 0.7),
       child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen>
   }) {
     final decoration = BoxDecoration(
       borderRadius: BorderRadius.circular(24),
-      color: gradient == null ? Colors.white.withOpacity(0.05) : null,
+      color: gradient == null ? Colors.white.withValues(alpha: 0.05) : null,
       gradient: gradient == null
           ? null
           : LinearGradient(
@@ -239,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen>
           ? null
           : [
               BoxShadow(
-                color: gradient.first.withOpacity(0.35),
+                color: gradient.first.withValues(alpha: 0.35),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(icon, color: Colors.white, size: 28),
@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen>
                       children: [
                         Expanded(
                           child: AspectRatio(
-                            aspectRatio: 1,
+                            aspectRatio: 0.85,
                             child: _buildActionCard(
                               title: 'Gallery',
                               subtitle: 'Open an image from your device',
@@ -349,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen>
                         const SizedBox(width: 16),
                         Expanded(
                           child: AspectRatio(
-                            aspectRatio: 1,
+                            aspectRatio: 0.85,
                             child: _buildActionCard(
                               title: 'Text',
                               subtitle: 'Find a landmark by keyword',
