@@ -127,6 +127,21 @@ flutter_app/
 │        └─ prototype_index.json                // 랜드마크 임베딩 (프로토타입)
 └─ pubspec.yaml
 ```
+## 20260526 Update
+
+### 🌐 다국어(한국어, 영어, 중국어, 일본어) 동적 지원 기능 개발 및 UI 리팩토링
+
+#### 1. 추가 사항 (Added)
+- **4개 국어 마스터 데이터 확장 (`assets/landmark_info.json`)**: 13개 전체 온디바이스 랜드마크에 대하여 중국어(`zh`) 및 일본어(`ja`)의 랜드마크 이름 및 개요 정보 메타데이터를 전격 보강했습니다.
+- **정적 UI 텍스트 다국어 번역 사전 신규 구축 (`lib/api/app_translations.dart`)**: 앱의 고정된 모든 문자열 레이블을 한국어, English, 简体中文, 日本語로 동적 변환 가능한 i18n 번역 사전을 구축했습니다.
+- **지구 모양 다국어 선택 버튼 탑재 (`lib/ui/screens/home_screen.dart`)**: 홈 화면 AppBar 우측 상단에 세련된 지구본 아이콘(`Icons.language`) 버튼을 탑재하여, 사용자가 변경한 언어에 맞춰 앱 전체가 실시간 반응형으로 바뀌도록 구성했습니다.
+
+#### 2. 수정 및 리팩토링 사항 (Modified)
+- **SQLite 로컬 DB 스키마 및 마이그레이션 (`lib/data/database_helper.dart`)**: 테이블 정의에 다국어 이름/설명 컬럼들을 추가하고, DB 버전을 `3`으로 올려 구버전 사용자의 폰에서도 DROP 후 자동 데이터 리셋 및 마스터 데이터 재적재가 이루어지도록 고도화했습니다.
+- **로컬 API 클라이언트 동적 로케일 바인딩 (`lib/api/local_api_client_impl.dart`)**: `getLandmarkDetails` API 내에서 현재 상태의 `languageCode`에 알맞은 언어 정보(`name`, `description`)를 바인딩하여 리턴하는 dynamic dynamic-translation 로직을 완성했습니다.
+- **UI 화면 하드코딩 일괄 해제**:
+  - `result_screen.dart`, `detail_screen.dart`, `text_search_screen.dart` 내에서 특정 다국어 키(`name_ko` 등)를 수동 분기 처리하던 UI 하드코딩을 제거하고, API 레벨에서 가공된 `data['name']` 및 `data['description']` 공통 다국어 프로퍼티를 직접 렌더링하도록 일괄 구조를 개선했습니다.
+- **위젯 테스트 문법 오류 해결 (`test/widget_test.dart`)**: 기본 카운터 템플릿과의 문법 크래시 에러를 제거하고 clean placeholder 테스트로 갱신하여 `flutter analyze` 100% 무오류 통과(0 Errors)를 실현했습니다.
 
 ---
 
