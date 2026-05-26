@@ -21,20 +21,26 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 3,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
   }
 
   Future _createDB(Database db, int version) async {
-    // Landmarks 테이블: district 컬럼 추가 및 복합 Unique Key 설정
+    // Landmarks 테이블: 다국어(name_zh, name_ja, description_en, description_zh, description_ja) 컬럼 추가
     await db.execute('''
       CREATE TABLE landmarks (
         id TEXT PRIMARY KEY,
         name_ko TEXT NOT NULL,
         name_en TEXT NOT NULL,
+        name_zh TEXT NOT NULL,
+        name_ja TEXT NOT NULL,
         district TEXT,
         description_ko TEXT,
+        description_en TEXT,
+        description_zh TEXT,
+        description_ja TEXT,
         latitude REAL CHECK (latitude >= -90.0 AND latitude <= 90.0),
         longitude REAL CHECK (longitude >= -180.0 AND longitude <= 180.0),
         UNIQUE(name_ko, district)
@@ -65,6 +71,15 @@ class DatabaseHelper {
         latency_ms INTEGER
       )
     ''');
+  }
+
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 3) {
+      await db.execute('DROP TABLE IF EXISTS candidate_texts');
+      await db.execute('DROP TABLE IF EXISTS landmarks');
+      await db.execute('DROP TABLE IF EXISTS search_logs');
+      await _createDB(db, newVersion);
+    }
   }
 
   /// JSON 주소 필드 또는 설명에서 '구(District)' 추출
@@ -107,8 +122,13 @@ class DatabaseHelper {
         'id': item['landmark_id'],
         'name_ko': item['name_ko'],
         'name_en': item['name_en'],
+        'name_zh': item['name_zh'],
+        'name_ja': item['name_ja'],
         'district': district,
         'description_ko': item['description_ko'],
+        'description_en': item['description_en'],
+        'description_zh': item['description_zh'],
+        'description_ja': item['description_ja'],
         'latitude': item['latitude'],
         'longitude': item['longitude'],
       }, conflictAlgorithm: ConflictAlgorithm.ignore);

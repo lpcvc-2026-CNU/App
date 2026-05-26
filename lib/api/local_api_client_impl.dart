@@ -6,15 +6,15 @@ import '../services/onnx_inference_service.dart';
 import '../services/image_quality_service.dart';
 import '../data/database_helper.dart';
 
-/// Python search.py ConfidencePolicy 와 동일한 파라미터
+/// 온디바이스 시연 환경에 알맞게 보정 및 완화된 ConfidencePolicy 임계값 파라미터
 class _ConfidencePolicy {
-  static const double rejectThreshold            = 0.25;
-  static const double weakRejectThreshold        = 0.35;
-  static const double weakMargin                 = 0.12;
-  static const double matchThreshold             = 0.60;
-  static const double matchFloor                 = 0.50;
-  static const double matchMargin                = 0.20;
-  static const double textNoKeywordRejectThreshold = 0.35;
+  static const double rejectThreshold            = 0.18; // 양자화 모델 스코어 저하 고려 완화
+  static const double weakRejectThreshold        = 0.25;
+  static const double weakMargin                 = 0.08;
+  static const double matchThreshold             = 0.45; // 0.60 -> 0.45 완화하여 정확도 매칭 활성화
+  static const double matchFloor                 = 0.35; // 0.50 -> 0.35 하향 조정
+  static const double matchMargin                = 0.10; // 0.20 -> 0.10 완화
+  static const double textNoKeywordRejectThreshold = 0.28;
 }
 
 class LocalApiClientImpl implements LocalApiClient {
@@ -23,6 +23,17 @@ class LocalApiClientImpl implements LocalApiClient {
   final DatabaseHelper _dbHelper;
 
   LocalApiClientImpl(this._onnxService, this._qualityService, this._dbHelper);
+
+  // ── 다국어 지원 로케일 정보 ──────────────────────────────────────────────────
+  String _languageCode = 'ko'; // 기본값은 한국어
+
+  @override
+  String get languageCode => _languageCode;
+
+  @override
+  set languageCode(String code) {
+    _languageCode = code;
+  }
 
   // ── 프로토타입 캐시 ─────────────────────────────────────────────────────────
   List<String>? _landmarkIds;
@@ -43,9 +54,6 @@ class LocalApiClientImpl implements LocalApiClient {
       final rawProto = (item['prototype'] as List<dynamic>)
           .map((e) => (e as num).toDouble())
           .toList();
-      // 프로토타입도 L2-정규화 (Python data.py load_prototype_index에서는
-      // 그대로 저장되어 있지만, search.py _cosine_to_matrix 는 "L2-정규화 가정" 하에
-      // 단순 행렬 곱으로 코사인 유사도를 계산함. 안전을 위해 여기서 정규화)
       ids.add(id);
       matrix.add(_l2Normalize(rawProto));
     }
@@ -168,7 +176,27 @@ class LocalApiClientImpl implements LocalApiClient {
   Future<Map<String, dynamic>> getLandmarkDetails(String id) async {
     final db = await _dbHelper.database;
     final res = await db.query('landmarks', where: 'id = ?', whereArgs: [id]);
-    return res.isNotEmpty ? res.first : {};
+    if (res.isEmpty) return {};
+
+    final row = Map<String, dynamic>.from(res.first);
+
+    // 설정된 languageCode에 따라 다국어 데이터 바인딩 (en, zh, ja, ko)
+    if (_languageCode == 'en') {
+      row['name'] = row['name_en'] ?? row['name_ko'] ?? id;
+      row['description'] = row['description_en'] ?? row['description_ko'] ?? '';
+    } else if (_languageCode == 'zh') {
+      row['name'] = row['name_zh'] ?? row['name_en'] ?? row['name_ko'] ?? id;
+      row['description'] = row['description_zh'] ?? row['description_en'] ?? row['description_ko'] ?? '';
+    } else if (_languageCode == 'ja') {
+      row['name'] = row['name_ja'] ?? row['name_en'] ?? row['name_ko'] ?? id;
+      row['description'] = row['description_ja'] ?? row['description_en'] ?? row['description_ko'] ?? '';
+    } else {
+      // 기본값 'ko'
+      row['name'] = row['name_ko'] ?? row['name_en'] ?? id;
+      row['description'] = row['description_ko'] ?? row['description_en'] ?? '';
+    }
+
+    return row;
   }
 
   @override

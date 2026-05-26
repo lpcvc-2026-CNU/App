@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../api/local_api_client.dart';
+import '../../api/app_translations.dart';
 
 class DetailScreen extends StatelessWidget {
   final String landmarkId;
@@ -14,12 +15,24 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+    final mediaQuery = MediaQuery.of(context);
+    final clampedTextScaler = mediaQuery.textScaler.clamp(
+      minScaleFactor: 0.85,
+      maxScaleFactor: 1.15,
+    );
+
+    return MediaQuery(
+      data: mediaQuery.copyWith(textScaler: clampedTextScaler),
+      child: Scaffold(
+        backgroundColor: const Color(0xFF121212),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: apiClient.getLandmarkDetails(landmarkId),
         builder: (context, snapshot) {
@@ -30,8 +43,7 @@ class DetailScreen extends StatelessWidget {
           }
 
           final data = snapshot.data ?? {};
-          final name = (data['name_ko'] ?? data['name_en'] ?? landmarkId)
-              .toString();
+          final name = (data['name'] ?? landmarkId).toString();
           final district = (data['district'] ?? 'District').toString();
 
           return SafeArea(
@@ -76,7 +88,7 @@ class DetailScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                if (data['description_ko'] != null || data['description_en'] != null)
+                if (data['description'] != null && data['description'].toString().isNotEmpty)
                   Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(18),
@@ -88,9 +100,9 @@ class DetailScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Overview',
-                          style: TextStyle(
+                        Text(
+                          AppTranslations.translate('landmark_overview', apiClient.languageCode),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -98,7 +110,7 @@ class DetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          (data['description_ko'] ?? data['description_en']).toString(),
+                          data['description'].toString(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15,
@@ -111,32 +123,32 @@ class DetailScreen extends StatelessWidget {
                 else
                   /*이곳에 랜드마크에 대한 개요를 기재해주세요*/
                   _buildPlaceholderSection(
-                    title: 'Overview',
+                    title: AppTranslations.translate('landmark_overview', apiClient.languageCode),
                     hint: '간단한 소개와 핵심 설명을 넣는 영역',
                     comment: '/*이곳에 랜드마크에 대한 개요를 기재해주세요*/',
                   ),
                 /*이곳에 랜드마크에 대한 역사 정보를 기재해주세요*/
                 _buildPlaceholderSection(
-                  title: 'History',
+                  title: '역사와 유래',
                   hint: '유래, 시대적 배경, 주요 사건을 넣는 영역',
                   comment: '/*이곳에 랜드마크에 대한 역사 정보를 기재해주세요*/',
                 ),
                 /*이곳에 랜드마크에 대한 건축 특징과 주요 포인트를 기재해주세요*/
                 _buildPlaceholderSection(
-                  title: 'Architecture / Highlights',
+                  title: '건축적 특징 및 주요 볼거리',
                   hint: '건축 특징, 관람 포인트, 대표 요소를 넣는 영역',
                   comment:
                       '/*이곳에 랜드마크에 대한 건축 특징과 주요 포인트를 기재해주세요*/',
                 ),
                 /*이곳에 랜드마크 방문 팁을 기재해주세요*/
                 _buildPlaceholderSection(
-                  title: 'Visitor Tips',
+                  title: '관람 팁 및 추천 포인트',
                   hint: '추천 동선, 촬영 포인트, 방문 팁을 넣는 영역',
                   comment: '/*이곳에 랜드마크 방문 팁을 기재해주세요*/',
                 ),
                 /*이곳에 랜드마크의 위치 및 접근 방법을 기재해주세요*/
                 _buildPlaceholderSection(
-                  title: 'Location / Access',
+                  title: '위치 및 찾아가는 길',
                   hint: '교통, 주변 지역, 접근 방법을 넣는 영역',
                   comment:
                       '/*이곳에 랜드마크의 위치 및 접근 방법을 기재해주세요*/',
@@ -146,8 +158,9 @@ class DetailScreen extends StatelessWidget {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildPlaceholderSection({
     required String title,

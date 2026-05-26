@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../api/local_api_client.dart';
+import '../../api/app_translations.dart';
 import 'detail_screen.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -16,9 +17,25 @@ class ResultScreen extends StatefulWidget {
   State<ResultScreen> createState() => _ResultScreenState();
 }
 
-class _ResultScreenState extends State<ResultScreen> {
+class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderStateMixin {
   final ImagePicker _picker = ImagePicker();
   bool _isAnalyzing = false;
+  late final AnimationController _scanController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scanController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _scanController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickAndAnalyze(ImageSource source) async {
     final apiClient = widget.apiClient;
@@ -31,9 +48,10 @@ class _ResultScreenState extends State<ResultScreen> {
       final image = await _picker.pickImage(source: source);
       if (image == null) return;
 
-      final bytes = await image.readAsBytes();
+      // 이미지가 픽된 즉시 공백을 지우기 위해 오버레이 시작
       setState(() => _isAnalyzing = true);
 
+      final bytes = await image.readAsBytes();
       final newResult = await apiClient.search(bytes);
       newResult['image_bytes'] = bytes;
 
@@ -51,7 +69,11 @@ class _ResultScreenState extends State<ResultScreen> {
       if (!mounted) return;
       setState(() => _isAnalyzing = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Image search failed: $e')),
+        SnackBar(
+          content: Text(
+            '${AppTranslations.translate('search_fail', apiClient.languageCode)}$e',
+          ),
+        ),
       );
     }
   }
@@ -73,92 +95,183 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   Widget build(BuildContext context) {
     final decision = widget.result['decision'] as String? ?? 'out_of_scope';
+    final mediaQuery = MediaQuery.of(context);
+    final clampedTextScaler = mediaQuery.textScaler.clamp(
+      minScaleFactor: 0.85,
+      maxScaleFactor: 1.15,
+    );
+    final lang = widget.apiClient?.languageCode ?? 'ko';
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+    return MediaQuery(
+      data: mediaQuery.copyWith(textScaler: clampedTextScaler),
+      child: Scaffold(
+        backgroundColor: const Color(0xFF121212),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
-      ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: Column(
-              children: [
-                Container(
-                  height: 220,
-                  width: double.infinity,
-                  margin: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[850],
-                    borderRadius: BorderRadius.circular(16),
-                    image: widget.result['image_bytes'] != null &&
-                            (widget.result['image_bytes'] as Uint8List).isNotEmpty
-                        ? DecorationImage(
-                            image: MemoryImage(widget.result['image_bytes']),
-                            fit: BoxFit.cover,
+        body: Stack(
+          children: [
+            SafeArea(
+              child: Column(
+                children: [
+                  Container(
+                    height: 220,
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[850],
+                      borderRadius: BorderRadius.circular(16),
+                      image: widget.result['image_bytes'] != null &&
+                              (widget.result['image_bytes'] as Uint8List).isNotEmpty
+                          ? DecorationImage(
+                              image: MemoryImage(widget.result['image_bytes']),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: (widget.result['image_bytes'] == null ||
+                            (widget.result['image_bytes'] as Uint8List).isEmpty)
+                        ? const Center(
+                            child: Icon(
+                              Icons.image_outlined,
+                              size: 54,
+                              color: Colors.white38,
+                            ),
                           )
                         : null,
                   ),
-                  child: (widget.result['image_bytes'] == null ||
-                          (widget.result['image_bytes'] as Uint8List).isEmpty)
-                      ? const Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            size: 54,
-                            color: Colors.white38,
-                          ),
-                        )
-                      : null,
-                ),
-                Expanded(child: _buildDecisionContent(decision)),
-              ],
-            ),
-          ),
-          if (_isAnalyzing)
-            Container(
-              color: Colors.black.withValues(alpha: 0.7),
-              child: const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(color: Color(0xFFE61E2B)),
-                    SizedBox(height: 16),
-                    Text(
-                      'Analyzing landmark...',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ],
-                ),
+                  Expanded(child: _buildDecisionContent(decision, lang)),
+                ],
               ),
             ),
-        ],
+            if (_isAnalyzing) _buildScanningOverlay(lang),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildDecisionContent(String decision) {
+  Widget _buildScanningOverlay(String lang) {
+    return AnimatedBuilder(
+      animation: _scanController,
+      builder: (context, child) {
+        return Container(
+          color: Colors.black.withValues(alpha: 0.85),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFFE61E2B).withValues(alpha: 0.7),
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    color: Colors.white.withValues(alpha: 0.03),
+                  ),
+                  child: Stack(
+                    clipBehavior: Clip.antiAlias,
+                    children: [
+                      Positioned(
+                        top: 256 * _scanController.value,
+                        left: 12,
+                        right: 12,
+                        child: Container(
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE61E2B),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFE61E2B).withValues(alpha: 0.8),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      _buildCornerBracket(top: true, left: true),
+                      _buildCornerBracket(top: true, left: false),
+                      _buildCornerBracket(top: false, left: true),
+                      _buildCornerBracket(top: false, left: false),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 36),
+                Text(
+                  AppTranslations.translate('analyzing', lang),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppTranslations.translate('please_wait', lang),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCornerBracket({required bool top, required bool left}) {
+    return Positioned(
+      top: top ? 12 : null,
+      bottom: top ? null : 12,
+      left: left ? 12 : null,
+      right: left ? null : 12,
+      child: Container(
+        width: 18,
+        height: 18,
+        decoration: BoxDecoration(
+          border: Border(
+            top: top ? const BorderSide(color: Color(0xFFE61E2B), width: 3) : BorderSide.none,
+            bottom: top ? BorderSide.none : const BorderSide(color: Color(0xFFE61E2B), width: 3),
+            left: left ? const BorderSide(color: Color(0xFFE61E2B), width: 3) : BorderSide.none,
+            right: left ? BorderSide.none : const BorderSide(color: Color(0xFFE61E2B), width: 3),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDecisionContent(String decision, String lang) {
     switch (decision) {
       case 'matched':
         return _buildCandidateList(
-          title: 'Best match',
-          subtitle: 'Tap a candidate to open the landmark detail page.',
+          title: AppTranslations.translate('strong_candidate', lang),
+          subtitle: AppTranslations.translate('strong_candidate_desc', lang),
           candidates: (widget.result['top3'] as List<dynamic>? ?? const []).take(1).toList(),
+          lang: lang,
         );
       case 'ambiguous':
         return _buildCandidateList(
-          title: 'Top candidates',
-          subtitle: 'The result is ambiguous. Try another angle or inspect the candidates below.',
+          title: AppTranslations.translate('ambiguous_candidate', lang),
+          subtitle: AppTranslations.translate('ambiguous_candidate_desc', lang),
           candidates: (widget.result['top3'] as List<dynamic>? ?? const []).take(3).toList(),
+          lang: lang,
         );
       case 'low_quality':
       case 'out_of_scope':
       default:
-        return _buildOutOfScopeState();
+        return _buildOutOfScopeState(lang);
     }
   }
 
@@ -166,9 +279,10 @@ class _ResultScreenState extends State<ResultScreen> {
     required String title,
     required String subtitle,
     required List<dynamic> candidates,
+    required String lang,
   }) {
     if (candidates.isEmpty) {
-      return _buildOutOfScopeState();
+      return _buildOutOfScopeState(lang);
     }
 
     return ListView(
@@ -205,8 +319,9 @@ class _ResultScreenState extends State<ResultScreen> {
       future: widget.apiClient?.getLandmarkDetails(landmarkId),
       builder: (context, snapshot) {
         final data = snapshot.data ?? {};
-        final name = (data['name_ko'] ?? data['name_en'] ?? landmarkId).toString();
-        final desc = data['description_ko']?.toString() ?? data['description_en']?.toString();
+        // API 레벨에서 바인딩된 name 및 description 공통 다국어 프로퍼티 사용
+        final name = (data['name'] ?? landmarkId).toString();
+        final desc = data['description']?.toString();
 
         return GestureDetector(
           onTap: widget.apiClient == null ? null : () => _openDetail(landmarkId),
@@ -280,7 +395,7 @@ class _ResultScreenState extends State<ResultScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (desc != null) ...[
+                      if (desc != null && desc.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Text(
                           desc,
@@ -303,7 +418,7 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  Widget _buildOutOfScopeState() {
+  Widget _buildOutOfScopeState(String lang) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -312,19 +427,19 @@ class _ResultScreenState extends State<ResultScreen> {
           children: [
             const Icon(Icons.location_off, size: 80, color: Colors.white24),
             const SizedBox(height: 24),
-            const Text(
-              'No matching landmark was found.',
-              style: TextStyle(
+            Text(
+              AppTranslations.translate('no_match', lang),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Try taking a clearer photo with the landmark more centered.',
+            Text(
+              AppTranslations.translate('no_match_desc', lang),
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white54, fontSize: 15),
+              style: const TextStyle(color: Colors.white54, fontSize: 15),
             ),
             const SizedBox(height: 40),
             SizedBox(
@@ -332,9 +447,9 @@ class _ResultScreenState extends State<ResultScreen> {
               child: ElevatedButton.icon(
                 onPressed: () => _pickAndAnalyze(ImageSource.camera),
                 icon: const Icon(Icons.camera_alt, color: Colors.white),
-                label: const Text(
-                  'Retake Photo',
-                  style: TextStyle(color: Colors.white),
+                label: Text(
+                  AppTranslations.translate('shoot_again', lang),
+                  style: const TextStyle(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFE61E2B),
@@ -351,9 +466,9 @@ class _ResultScreenState extends State<ResultScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => _pickAndAnalyze(ImageSource.gallery),
                 icon: const Icon(Icons.photo_library, color: Colors.white),
-                label: const Text(
-                  'Choose Another Image',
-                  style: TextStyle(color: Colors.white),
+                label: Text(
+                  AppTranslations.translate('select_other_photo', lang),
+                  style: const TextStyle(color: Colors.white),
                 ),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.white54),

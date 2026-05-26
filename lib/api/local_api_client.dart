@@ -2,6 +2,10 @@ import 'dart:typed_data';
 
 /// 로컬 및 외부 API 간의 전환을 유연하게 하기 위한 추상 인터페이스
 abstract class LocalApiClient {
+  /// 현재 설정된 다국어 언어 코드 ('ko', 'en' 등)
+  String get languageCode;
+  set languageCode(String code);
+
   /// 통합 검색 파이프라인
   Future<Map<String, dynamic>> search(Uint8List imageBytes, {String? textQuery});
   

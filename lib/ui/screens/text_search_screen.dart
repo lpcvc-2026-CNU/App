@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../../api/local_api_client.dart';
+import '../../api/app_translations.dart';
 import 'detail_screen.dart';
 
 class TextSearchScreen extends StatefulWidget {
@@ -59,7 +60,13 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Text search failed: $e')));
+      ).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${AppTranslations.translate('text_search_fail', widget.apiClient.languageCode)}$e',
+          ),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isSearching = false);
@@ -81,6 +88,7 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = widget.apiClient.languageCode;
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
@@ -90,9 +98,9 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Text Search',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          AppTranslations.translate('text_search_title', lang),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
       body: SafeArea(
@@ -110,7 +118,7 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
                   style: const TextStyle(color: Colors.white),
                   textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
-                    hintText: 'Enter a landmark keyword',
+                    hintText: AppTranslations.translate('text_search_input_hint', lang),
                     hintStyle: const TextStyle(color: Colors.white38),
                     prefixIcon: const Icon(Icons.search, color: Colors.white54),
                     border: InputBorder.none,
@@ -131,7 +139,7 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
                         color: Color(0xFFE61E2B),
                       ),
                     )
-                  : _buildContent(),
+                  : _buildContent(lang),
             ),
           ],
         ),
@@ -139,19 +147,19 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(String lang) {
     if (_result == null) {
-      return const Center(
+      return Center(
         child: Text(
-          'Enter a query to search.',
-          style: TextStyle(color: Colors.white54, fontSize: 16),
+          AppTranslations.translate('enter_query_prompt', lang),
+          style: const TextStyle(color: Colors.white54, fontSize: 16),
         ),
       );
     }
 
     final decision = _result!['decision'] as String? ?? 'out_of_scope';
     if (decision == 'out_of_scope') {
-      return _buildOutOfScopeState();
+      return _buildOutOfScopeState(lang);
     }
 
     final topList = _result!['top3'] as List<dynamic>? ?? const [];
@@ -159,7 +167,7 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       children: [
         Text(
-          'Results (${topList.length})',
+          '${AppTranslations.translate('search', lang)} (${topList.length})',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -186,11 +194,8 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
         }
 
         final data = snapshot.data ?? {};
-        final name = data['name_ko'] ?? data['name_en'] ?? landmarkId;
-        final desc =
-            data['description_ko'] ??
-            data['description_en'] ??
-            'Description is not available yet.';
+        final name = data['name'] ?? landmarkId;
+        final desc = data['description'] ?? '';
 
         return GestureDetector(
           onTap: () => _openDetail(landmarkId),
@@ -239,16 +244,18 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        desc.toString(),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          height: 1.5,
+                      if (desc.toString().isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          desc.toString(),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            height: 1.5,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -260,28 +267,28 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
     );
   }
 
-  Widget _buildOutOfScopeState() {
-    return const Center(
+  Widget _buildOutOfScopeState(String lang) {
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 80, color: Colors.white24),
-            SizedBox(height: 24),
+            const Icon(Icons.search_off, size: 80, color: Colors.white24),
+            const SizedBox(height: 24),
             Text(
-              'No matching landmark was found.',
-              style: TextStyle(
+              AppTranslations.translate('no_search_result', lang),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
-              'Try a different keyword or landmark name.',
+              AppTranslations.translate('no_search_result_desc', lang),
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white54, fontSize: 15),
+              style: const TextStyle(color: Colors.white54, fontSize: 15),
             ),
           ],
         ),

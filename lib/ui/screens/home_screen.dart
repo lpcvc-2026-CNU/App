@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../api/local_api_client.dart';
+import '../../api/app_translations.dart';
 import 'result_screen.dart';
 import 'text_search_screen.dart';
 
@@ -17,11 +18,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   bool _isAnalyzing = false;
   final ImagePicker _picker = ImagePicker();
   late final AnimationController _pulseController;
   late final Animation<double> _pulseAnimation;
+  late final AnimationController _scanController;
 
   @override
   void initState() {
@@ -33,11 +35,16 @@ class _HomeScreenState extends State<HomeScreen>
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+    _scanController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _pulseController.dispose();
+    _scanController.dispose();
     super.dispose();
   }
 
@@ -45,10 +52,15 @@ class _HomeScreenState extends State<HomeScreen>
     try {
       final image = await _picker.pickImage(source: source);
       if (image == null) return;
+      
+      // 이미지가 선택된 즉시 공백 없이 스캔 오버레이 시작
+      setState(() => _isAnalyzing = true);
+      
       final bytes = await image.readAsBytes();
       await _onImageSelected(bytes);
     } catch (e) {
-      _showMessage('Failed to load image: $e');
+      setState(() => _isAnalyzing = false);
+      _showMessage('${AppTranslations.translate('camera_fail', widget.apiClient.languageCode)}$e');
     }
   }
 
@@ -80,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen>
       if (!mounted) return;
       setState(() => _isAnalyzing = false);
       _showMessage(
-        'Image search could not start. ONNX model initialization likely failed. Please check the logs.',
+        AppTranslations.translate('search_init_fail', widget.apiClient.languageCode),
       );
     }
   }
@@ -110,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen>
     } catch (e) {
       if (!mounted) return;
       setState(() => _isAnalyzing = false);
-      _showMessage('Text search failed: $e');
+      _showMessage('${AppTranslations.translate('text_search_fail', widget.apiClient.languageCode)}$e');
     }
   }
 
@@ -121,21 +133,21 @@ class _HomeScreenState extends State<HomeScreen>
       builder: (context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1E1E1E),
-          title: const Text(
-            'Search landmarks by text',
-            style: TextStyle(color: Colors.white),
+          title: Text(
+            AppTranslations.translate('text_search_dialog_title', widget.apiClient.languageCode),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           content: TextField(
             controller: controller,
             style: const TextStyle(color: Colors.white),
             textInputAction: TextInputAction.search,
-            decoration: const InputDecoration(
-              hintText: 'e.g. Gyeongbokgung, Myeongdong Cathedral',
-              hintStyle: TextStyle(color: Colors.white38),
-              enabledBorder: UnderlineInputBorder(
+            decoration: InputDecoration(
+              hintText: AppTranslations.translate('text_search_hint', widget.apiClient.languageCode),
+              hintStyle: const TextStyle(color: Colors.white38),
+              enabledBorder: const UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.white38),
               ),
-              focusedBorder: UnderlineInputBorder(
+              focusedBorder: const UnderlineInputBorder(
                 borderSide: BorderSide(color: Color(0xFFE61E2B)),
               ),
             ),
@@ -147,9 +159,9 @@ class _HomeScreenState extends State<HomeScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: Colors.white54),
+              child: Text(
+                AppTranslations.translate('cancel', widget.apiClient.languageCode),
+                style: const TextStyle(color: Colors.white54),
               ),
             ),
             ElevatedButton(
@@ -160,7 +172,10 @@ class _HomeScreenState extends State<HomeScreen>
                 Navigator.pop(context);
                 _onTextSearch(controller.text);
               },
-              child: const Text('Search', style: TextStyle(color: Colors.white)),
+              child: Text(
+                AppTranslations.translate('search', widget.apiClient.languageCode),
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -170,12 +185,12 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _showQualityErrorSnackbar(List<String> reasons) {
     var message =
-        'The photo was hard to analyze. Please retake it more clearly.';
+        AppTranslations.translate('quality_error_general', widget.apiClient.languageCode);
     if (reasons.contains('too_dark')) {
-      message = 'The photo is too dark. Please retake it in brighter light.';
+      message = AppTranslations.translate('quality_error_dark', widget.apiClient.languageCode);
     }
     if (reasons.contains('blur_detected')) {
-      message = 'The photo is blurry. Please refocus and try again.';
+      message = AppTranslations.translate('quality_error_blur', widget.apiClient.languageCode);
     }
     _showMessage(message);
   }
@@ -191,26 +206,98 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildScanningOverlay() {
-    return Container(
-      color: Colors.black.withValues(alpha: 0.7),
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              color: Color(0xFFE61E2B),
-              strokeWidth: 3,
+    return AnimatedBuilder(
+      animation: _scanController,
+      builder: (context, child) {
+        return Container(
+          color: Colors.black.withValues(alpha: 0.85),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFFE61E2B).withValues(alpha: 0.7),
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    color: Colors.white.withValues(alpha: 0.03),
+                  ),
+                  child: Stack(
+                    clipBehavior: Clip.antiAlias,
+                    children: [
+                      // 위아래로 움직이는 스캔 레이저 라인
+                      Positioned(
+                        top: 256 * _scanController.value,
+                        left: 12,
+                        right: 12,
+                        child: Container(
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE61E2B),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFE61E2B).withValues(alpha: 0.8),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // 네 모퉁이에 고급 포커스 브래킷 디자인 추가
+                      _buildCornerBracket(top: true, left: true),
+                      _buildCornerBracket(top: true, left: false),
+                      _buildCornerBracket(top: false, left: true),
+                      _buildCornerBracket(top: false, left: false),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 36),
+                Text(
+                  AppTranslations.translate('analyzing', widget.apiClient.languageCode),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppTranslations.translate('please_wait', widget.apiClient.languageCode),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 24),
-            Text(
-              'Analyzing landmark...',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCornerBracket({required bool top, required bool left}) {
+    return Positioned(
+      top: top ? 12 : null,
+      bottom: top ? null : 12,
+      left: left ? 12 : null,
+      right: left ? null : 12,
+      child: Container(
+        width: 18,
+        height: 18,
+        decoration: BoxDecoration(
+          border: Border(
+            top: top ? const BorderSide(color: Color(0xFFE61E2B), width: 3) : BorderSide.none,
+            bottom: top ? BorderSide.none : const BorderSide(color: Color(0xFFE61E2B), width: 3),
+            left: left ? const BorderSide(color: Color(0xFFE61E2B), width: 3) : BorderSide.none,
+            right: left ? BorderSide.none : const BorderSide(color: Color(0xFFE61E2B), width: 3),
+          ),
         ),
       ),
     );
@@ -230,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen>
       gradient: gradient == null
           ? null
           : LinearGradient(
-              colors: gradient,
+               colors: gradient,
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -266,17 +353,24 @@ class _HomeScreenState extends State<HomeScreen>
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: titleSize,
-                    fontWeight: FontWeight.bold,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: titleSize,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
@@ -289,85 +383,123 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      appBar: AppBar(
-        title: const Text(
-          'Seoul Landmark Assistant',
-          style: TextStyle(fontWeight: FontWeight.bold),
+    final mediaQuery = MediaQuery.of(context);
+    final clampedTextScaler = mediaQuery.textScaler.clamp(
+      minScaleFactor: 0.85,
+      maxScaleFactor: 1.15,
+    );
+
+    return MediaQuery(
+      data: mediaQuery.copyWith(textScaler: clampedTextScaler),
+      child: Scaffold(
+        backgroundColor: const Color(0xFF121212),
+        appBar: AppBar(
+          title: Text(
+            AppTranslations.translate('app_title', widget.apiClient.languageCode),
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.language, color: Colors.white),
+              tooltip: AppTranslations.translate('language_select', widget.apiClient.languageCode),
+              onSelected: (String code) {
+                setState(() {
+                  widget.apiClient.languageCode = code;
+                });
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'ko',
+                  child: Text('한국어'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'en',
+                  child: Text('English'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'zh',
+                  child: Text('简体中文'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'ja',
+                  child: Text('日本語'),
+                ),
+              ],
+            ),
+          ],
         ),
-      ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Choose how you want to search',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      height: 1.3,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  ScaleTransition(
-                    scale: _pulseAnimation,
-                    child: SizedBox(
-                      height: 190,
-                      width: double.infinity,
-                      child: _buildActionCard(
-                        title: 'Camera',
-                        subtitle: 'Take a photo and identify a landmark',
-                        icon: Icons.camera_alt,
-                        onTap: () => _pickImage(ImageSource.camera),
-                        gradient: const [Color(0xFFE61E2B), Color(0xFF8A0038)],
+        body: Stack(
+          children: [
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+                    Text(
+                      AppTranslations.translate('select_search_method', widget.apiClient.languageCode),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        height: 1.3,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: AspectRatio(
-                            aspectRatio: 0.85,
-                            child: _buildActionCard(
-                              title: 'Gallery',
-                              subtitle: 'Open an image from your device',
-                              icon: Icons.photo_library,
-                              titleSize: 20,
-                              onTap: () => _pickImage(ImageSource.gallery),
-                            ),
-                          ),
+                    const SizedBox(height: 32),
+                    ScaleTransition(
+                      scale: _pulseAnimation,
+                      child: SizedBox(
+                        height: 190,
+                        width: double.infinity,
+                        child: _buildActionCard(
+                          title: AppTranslations.translate('camera_shot', widget.apiClient.languageCode),
+                          subtitle: AppTranslations.translate('camera_shot_desc', widget.apiClient.languageCode),
+                          icon: Icons.camera_alt,
+                          onTap: () => _pickImage(ImageSource.camera),
+                          gradient: const [Color(0xFFE61E2B), Color(0xFF8A0038)],
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: AspectRatio(
-                            aspectRatio: 0.85,
-                            child: _buildActionCard(
-                              title: 'Text',
-                              subtitle: 'Find a landmark by keyword',
-                              icon: Icons.search,
-                              titleSize: 20,
-                              onTap: _showTextSearchDialog,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: AspectRatio(
+                              aspectRatio: 0.85,
+                              child: _buildActionCard(
+                                title: AppTranslations.translate('gallery_load', widget.apiClient.languageCode),
+                                subtitle: AppTranslations.translate('gallery_load_desc', widget.apiClient.languageCode),
+                                icon: Icons.photo_library,
+                                titleSize: 18,
+                                onTap: () => _pickImage(ImageSource.gallery),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: AspectRatio(
+                              aspectRatio: 0.85,
+                              child: _buildActionCard(
+                                title: AppTranslations.translate('keyword_search', widget.apiClient.languageCode),
+                                subtitle: AppTranslations.translate('keyword_search_desc', widget.apiClient.languageCode),
+                                icon: Icons.search,
+                                titleSize: 18,
+                                onTap: _showTextSearchDialog,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          if (_isAnalyzing) _buildScanningOverlay(),
-        ],
+            if (_isAnalyzing) _buildScanningOverlay(),
+          ],
+        ),
       ),
     );
   }
