@@ -48,3 +48,20 @@ assets/mobile_artifacts_int8/*.onnx
 assets/mobile_artifacts_int8/*.onnx.data
 *.pt
 best.pt
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Local Environment / Credentials
+.env
+.venv/
+env/
+venv/
+ENV/
