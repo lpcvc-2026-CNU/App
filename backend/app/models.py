@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, Numeric, DateTime, func
+from sqlalchemy import Column, String, Text, Numeric, DateTime, Boolean, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -27,4 +27,17 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False, comment="비밀번호 해시")
     nickname = Column(String(100), nullable=False, comment="닉네임")
     push_token = Column(String(255), nullable=True, comment="FCM 푸시 토큰")
+    is_admin = Column(Boolean, default=False, nullable=False, comment="관리자 여부")
     created_at = Column(DateTime, server_default=func.now(), comment="가입일시")
+
+class Suggestion(Base):
+    __tablename__ = "suggestions"
+
+    id = Column(String(100), primary_key=True, comment="건의 사항 고유 ID (UUID)")
+    user_id = Column(String(100), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True, comment="제출 사용자 ID")
+    landmark_name = Column(String(255), nullable=False, comment="건의할 랜드마크 이름")
+    description = Column(Text, nullable=False, comment="랜드마크 상세 설명")
+    status = Column(String(50), nullable=False, default="pending", index=True, comment="건의 처리 상태")
+    rejection_reason = Column(String(255), nullable=True, comment="반려 사유 (반려 시에만 기록)")
+    created_at = Column(DateTime, server_default=func.now(), comment="제출 일시")
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment="수정 일시")

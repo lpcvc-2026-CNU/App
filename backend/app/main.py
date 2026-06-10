@@ -8,7 +8,7 @@ from firebase_admin import credentials
 
 from app.database import engine
 from app.models import Base
-from app.routers import auth, landmarks, notifications
+from app.routers import auth, landmarks, notifications, suggestions
 
 # 로거 설정
 logger = logging.getLogger("uvicorn.error")
@@ -53,6 +53,8 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(landmarks.router)
 app.include_router(notifications.router)
+app.include_router(suggestions.router)
+
 
 @app.get("/")
 def read_root():
