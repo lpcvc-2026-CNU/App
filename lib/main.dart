@@ -8,10 +8,15 @@ import 'auth/token_storage.dart';
 import 'data/database_helper.dart';
 import 'services/image_quality_service.dart';
 import 'services/onnx_inference_service.dart';
+import 'services/push_notification_service.dart';
 import 'ui/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // [김규현] FCM 푸시 알림 인프라 초기화.
+  // Firebase 설정 파일이 없으면 Mock Sandbox 모드로 자동 전환됨.
+  await PushNotificationService.instance.initialize();
 
   await DatabaseHelper.instance.database;
   try {
@@ -25,7 +30,7 @@ void main() async {
   final dbHelper = DatabaseHelper.instance;
   final apiClient = LocalApiClientImpl(onnxService, qualityService, dbHelper);
 
-  // 인증: 보안 저장소 기반 토큰 보관 + 전역 컨트롤러.
+  // [금동엽] 인증: 보안 저장소 기반 토큰 보관 + 전역 컨트롤러.
   final authController = AuthController(storage: SecureTokenStorage());
   // 저장된 토큰을 확인해 로그인 상태를 복원.
   await authController.bootstrap();
@@ -56,7 +61,7 @@ class LandmarkApp extends StatelessWidget {
             elevation: 0,
           ),
         ),
-        // 로그인 여부에 따라 로그인 화면 ↔ 홈 화면을 자동 분기.
+        // [금동엽] 로그인 여부에 따라 로그인 화면 ↔ 홈 화면을 자동 분기.
         home: AuthGuard(child: HomeScreen(apiClient: apiClient)),
       ),
     );

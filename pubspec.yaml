@@ -10,11 +10,15 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # 인증 토큰 보안 저장(Android Keystore / iOS Keychain)
+  # [금동엽] 인증 토큰 보안 저장 (Android Keystore / iOS Keychain)
   flutter_secure_storage: ^9.2.2
 
-  # 올바른 패키지 명칭과 버전으로 수정
-  onnxruntime: ^1.4.1 
+  # [김규현] Firebase Cloud Messaging (FCM) 알림 인프라
+  firebase_core: ^3.0.0
+  firebase_messaging: ^15.0.0
+
+  # 온디바이스 추론 및 공통 유틸
+  onnxruntime: ^1.4.1
   sqflite: ^2.3.0
   path_provider: ^2.1.1
   image: ^4.1.3
