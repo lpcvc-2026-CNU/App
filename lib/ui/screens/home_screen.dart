@@ -8,6 +8,8 @@ import '../../api/app_translations.dart';
 import 'result_screen.dart';
 import 'text_search_screen.dart';
 
+import 'auth/account_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   final LocalApiClient apiClient;
 
@@ -425,6 +427,14 @@ class _HomeScreenState extends State<HomeScreen>
                   child: Text('日本語'),
                 ),
               ],
+            ),
+            IconButton(
+              tooltip: '내 계정',
+              icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AccountScreen()),
+              ),
             ),
           ],
         ),
