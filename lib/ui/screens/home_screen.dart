@@ -9,6 +9,7 @@ import 'result_screen.dart';
 import 'text_search_screen.dart';
 
 import 'auth/account_screen.dart';
+import 'suggestion/suggestion_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final LocalApiClient apiClient;
@@ -427,6 +428,14 @@ class _HomeScreenState extends State<HomeScreen>
                   child: Text('日本語'),
                 ),
               ],
+            ),
+            IconButton(
+              tooltip: '랜드마크 건의',
+              icon: const Icon(Icons.add_location_alt_outlined, color: Colors.white),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => SuggestionScreen()),
+              ),
             ),
             IconButton(
               tooltip: '내 계정',
