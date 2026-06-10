@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from typing import Optional
+from datetime import datetime
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. 인증 및 회원 관련 스키마 (Auth / User Schemas)
@@ -48,3 +49,35 @@ class LandmarkResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. 건의 사항 관련 스키마 (Suggestion Schemas)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class SuggestionCreate(BaseModel):
+    landmark_name: str = Field(..., min_length=1, max_length=255, description="건의할 랜드마크 이름")
+    description: str = Field(..., min_length=1, description="랜드마크에 대한 간단한 설명")
+
+class SuggestionStatusUpdate(BaseModel):
+    status: str = Field(..., description="변경할 상태 ('approved' 또는 'rejected')")
+    rejection_reason: Optional[str] = Field(None, description="반려 사유 (rejected일 경우 필수)")
+
+    @model_validator(mode="after")
+    def check_rejection_reason(self) -> "SuggestionStatusUpdate":
+        if self.status == "rejected":
+            if not self.rejection_reason or not self.rejection_reason.strip():
+                raise ValueError("반려 상태로 변경 시 반려 사유(rejection_reason)는 필수이며 비어있을 수 없습니다.")
+        return self
+
+class SuggestionResponse(BaseModel):
+    id: str
+    user_id: str
+    landmark_name: str
+    description: str
+    status: str
+    rejection_reason: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
