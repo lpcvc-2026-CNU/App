@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../api/local_api_client.dart';
 import '../../api/app_translations.dart';
+import '../../data/suggestion_repository.dart';
 import 'result_screen.dart';
 import 'text_search_screen.dart';
 
@@ -13,8 +14,13 @@ import 'suggestion/suggestion_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final LocalApiClient apiClient;
+  final SuggestionRepository suggestionRepository;
 
-  const HomeScreen({super.key, required this.apiClient});
+  const HomeScreen({
+    super.key,
+    required this.apiClient,
+    required this.suggestionRepository,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -434,7 +440,11 @@ class _HomeScreenState extends State<HomeScreen>
               icon: const Icon(Icons.add_location_alt_outlined, color: Colors.white),
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => SuggestionScreen()),
+                MaterialPageRoute(
+                  builder: (_) => SuggestionScreen(
+                    repository: widget.suggestionRepository,
+                  ),
+                ),
               ),
             ),
             IconButton(

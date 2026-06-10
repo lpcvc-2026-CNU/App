@@ -1,13 +1,21 @@
-/// 랜드마크 건의 중복 여부를 판별하는 추상 인터페이스.
+import '../api/backend_client.dart';
+import 'landmark_repository.dart';
+
+/// 랜드마크 건의의 중복 검사 및 제출을 담당하는 추상 인터페이스.
 ///
-/// 실제 구현은 김민재 님 1순위(랜드마크 DB 조회)가 완료되면
-/// 서버/로컬 DB를 조회하는 형태로 교체된다. 그 전까지는 [MockSuggestionRepository]
-/// 가 하드코딩된 지원 리스트로 UI 흐름을 검증한다.
+/// 실연동 구현은 [ApiSuggestionRepository] 이며, UI/단위 테스트용으로는
+/// [MockSuggestionRepository] 가 하드코딩 리스트로 흐름을 검증한다.
 abstract class SuggestionRepository {
   /// 입력한 랜드마크명이 이미 지원되는지 검사.
   ///
   /// 중복이면 매칭된 기존 항목명을 반환하고, 아니면 null.
   Future<String?> findExisting(String name);
+
+  /// 건의 제출. 서버측 중복 검증에서 막히면 [BackendException](400)이 던져진다.
+  Future<void> submit({
+    required String landmarkName,
+    required String description,
+  });
 }
 
 /// 비교용 정규화: 공백 제거 + 소문자화.
@@ -45,10 +53,48 @@ class MockSuggestionRepository implements SuggestionRepository {
 
   @override
   Future<String?> findExisting(String name) async {
-    // TODO(api): 김민재 님 1순위(랜드마크 DB 조회) 연동.
-    //   서버/로컬 DB에서 정규화된 이름으로 중복 조회하도록 교체.
     final key = normalizeLandmarkName(name);
     if (key.isEmpty) return null;
     return _index[key];
+  }
+
+  @override
+  Future<void> submit({
+    required String landmarkName,
+    required String description,
+  }) async {
+    // 목 구현: 실제 전송 없이 지연만 흉내낸다.
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+  }
+}
+
+/// 백엔드(`/api/...`) 실연동 구현.
+///
+/// - 중복 검사: [LandmarkRepository]가 캐시한 공식 랜드마크 목록과 대조.
+/// - 제출: `POST /api/suggestions` (인증 필요). 서버가 대기/승인 건까지
+///   포함해 최종 중복을 검증하며, 막히면 [BackendException](400)을 던진다.
+class ApiSuggestionRepository implements SuggestionRepository {
+  ApiSuggestionRepository({
+    required BackendClient client,
+    required LandmarkRepository landmarks,
+  })  : _client = client,
+        _landmarks = landmarks;
+
+  final BackendClient _client;
+  final LandmarkRepository _landmarks;
+
+  @override
+  Future<String?> findExisting(String name) => _landmarks.findExisting(name);
+
+  @override
+  Future<void> submit({
+    required String landmarkName,
+    required String description,
+  }) async {
+    await _client.postJson(
+      '/api/suggestions',
+      {'landmark_name': landmarkName, 'description': description},
+      auth: true,
+    );
   }
 }

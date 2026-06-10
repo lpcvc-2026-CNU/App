@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../api/backend_client.dart';
 import '../../../data/suggestion_repository.dart';
 
 /// 사용자 랜드마크 건의 입력 페이지.
@@ -36,6 +37,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
   /// 같은 중복에 대해 팝업을 반복해서 띄우지 않도록 마지막으로 팝업을 띄운 값 기억.
   String? _lastPoppedFor;
+  bool _submitting = false;
 
   @override
   void initState() {
@@ -120,19 +122,52 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       return;
     }
 
-    // TODO(api): 건의 등록 API 연동(현재는 제출 성공 처리만).
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text('건의가 접수되었어요. 검토 후 알림으로 안내해 드릴게요.'),
-      ),
-    );
-    Navigator.of(context).maybePop();
+    setState(() => _submitting = true);
+    try {
+      // 위치(선택)와 추천 이유(선택)를 합쳐 description으로 전송.
+      final location = _locationController.text.trim();
+      final reason = _reasonController.text.trim();
+      final description = [
+        if (location.isNotEmpty) '위치: $location',
+        if (reason.isNotEmpty) reason,
+      ].join('\n');
+
+      await widget.repository.submit(
+        landmarkName: _nameController.text.trim(),
+        description: description,
+      );
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text('건의가 접수되었어요. 검토 후 알림으로 안내해 드릴게요.'),
+        ),
+      );
+      Navigator.of(context).maybePop();
+    } on BackendException catch (e) {
+      if (!mounted) return;
+      if (e.isDuplicate) {
+        // 서버 측 중복 판정 → 기존 팝업 UX 재활용.
+        setState(() => _duplicateOf = _nameController.text.trim());
+        await _showDuplicatePopup(_nameController.text.trim());
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(e.message),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final hasDuplicate = _duplicateOf != null;
+    final blocked = hasDuplicate || _submitting;
 
     return Scaffold(
       backgroundColor: _bg,
@@ -210,16 +245,22 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    // 중복이면 제출 차단.
-                    onPressed: hasDuplicate ? null : _submit,
-                    child: Text(
-                      hasDuplicate ? '이미 등록된 랜드마크예요' : '건의하기',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    onPressed: blocked ? null : _submit,
+                    child: _submitting
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2.5, color: Colors.white),
+                          )
+                        : Text(
+                            hasDuplicate ? '이미 등록된 랜드마크예요' : '건의하기',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ],
