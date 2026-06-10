@@ -1,0 +1,22 @@
+{
+  "version": "sprint1-mobile-preprocessing-v1",
+  "input_name": "image",
+  "output_name": "embedding",
+  "image_size": 224,
+  "resize_short_side_scale": 1.15,
+  "crop": "center",
+  "color_space": "RGB",
+  "layout": "NCHW",
+  "dtype": "float32",
+  "value_range": "0_1",
+  "mean": [
+    0.48145466,
+    0.4578275,
+    0.40821073
+  ],
+  "std": [
+    0.26862954,
+    0.26130258,
+    0.27577711
+  ]
+}
