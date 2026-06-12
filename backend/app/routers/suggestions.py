@@ -129,4 +129,38 @@ def update_suggestion_status(
     suggestion.status = payload.status
     db.commit()
     db.refresh(suggestion)
+
+    # 관리자 상태 변경에 따른 알림 생성 및 실시간 푸시 발송 트리거
+    title = ""
+    body = ""
+    if suggestion.status == "approved":
+        title = "랜드마크 건의 승인"
+        body = f"제안하신 '{suggestion.landmark_name}' 건의가 승인되었습니다."
+    elif suggestion.status == "rejected":
+        title = "랜드마크 건의 반려"
+        body = f"제안하신 '{suggestion.landmark_name}' 건의가 반려되었습니다. 사유: {suggestion.rejection_reason}"
+
+    if title and body:
+        # DB 알림 내역 저장
+        from app.models import Notification
+        new_notification = Notification(
+            id=str(uuid.uuid4()),
+            user_id=suggestion.user_id,
+            title=title,
+            body=body,
+            is_read=False
+        )
+        db.add(new_notification)
+        db.commit()
+
+        # 푸시 토큰 조회 후 실시간 발송
+        target_user = db.query(User).filter(User.id == suggestion.user_id).first()
+        if target_user and target_user.push_token:
+            from app.routers.notifications import send_push_notification_helper
+            send_push_notification_helper(
+                token=target_user.push_token,
+                title=title,
+                body=body
+            )
+
     return suggestion

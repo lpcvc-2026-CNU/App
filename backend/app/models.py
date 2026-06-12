@@ -40,4 +40,15 @@ class Suggestion(Base):
     status = Column(String(50), nullable=False, default="pending", index=True, comment="건의 처리 상태")
     rejection_reason = Column(String(255), nullable=True, comment="반려 사유 (반려 시에만 기록)")
     created_at = Column(DateTime, server_default=func.now(), comment="제출 일시")
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment="수정 일시")
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment="수정 일시")
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(String(100), primary_key=True, comment="알림 고유 ID (UUID)")
+    user_id = Column(String(100), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True, comment="수신 사용자 ID")
+    title = Column(String(255), nullable=False, comment="알림 제목")
+    body = Column(Text, nullable=False, comment="알림 내용")
+    is_read = Column(Boolean, default=False, nullable=False, comment="읽음 여부")
+    created_at = Column(DateTime, server_default=func.now(), comment="생성 일시")

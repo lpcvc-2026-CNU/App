@@ -80,4 +80,20 @@ class SuggestionResponse(BaseModel):
     updated_at: datetime
 
     class Config:
+        from_attributes = True
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. 알림 관련 스키마 (Notification Schemas)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class NotificationResponse(BaseModel):
+    id: str
+    user_id: str
+    title: str
+    body: str
+    is_read: bool
+    created_at: datetime
+
+    class Config:
         from_attributes = True
