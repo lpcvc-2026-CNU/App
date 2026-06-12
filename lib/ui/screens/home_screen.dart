@@ -5,21 +5,30 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../api/local_api_client.dart';
 import '../../api/app_translations.dart';
+import '../../auth/auth_scope.dart';
+import '../../data/admin_suggestion_repository.dart';
+import '../../data/notification_repository.dart';
 import '../../data/suggestion_repository.dart';
 import 'result_screen.dart';
 import 'text_search_screen.dart';
 
+import 'admin/admin_suggestion_list_screen.dart';
 import 'auth/account_screen.dart';
+import 'notification/notification_screen.dart';
 import 'suggestion/suggestion_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final LocalApiClient apiClient;
   final SuggestionRepository suggestionRepository;
+  final NotificationRepository notificationRepository;
+  final AdminSuggestionRepository adminSuggestionRepository;
 
   const HomeScreen({
     super.key,
     required this.apiClient,
     required this.suggestionRepository,
+    required this.notificationRepository,
+    required this.adminSuggestionRepository,
   });
 
   @override
@@ -435,6 +444,33 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
               ],
             ),
+            IconButton(
+              tooltip: '알림함',
+              icon: const Icon(Icons.notifications_none, color: Colors.white),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => NotificationScreen(
+                    repository: widget.notificationRepository,
+                  ),
+                ),
+              ),
+            ),
+            // 관리자 계정에만 노출되는 건의 관리(승인/반려) 진입점.
+            if (AuthScope.of(context).user?.isAdmin == true)
+              IconButton(
+                tooltip: '건의 관리',
+                icon: const Icon(Icons.admin_panel_settings_outlined,
+                    color: Colors.white),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AdminSuggestionListScreen(
+                      repository: widget.adminSuggestionRepository,
+                    ),
+                  ),
+                ),
+              ),
             IconButton(
               tooltip: '랜드마크 건의',
               icon: const Icon(Icons.add_location_alt_outlined, color: Colors.white),

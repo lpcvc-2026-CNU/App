@@ -6,8 +6,10 @@ import 'auth/auth_controller.dart';
 import 'auth/auth_guard.dart';
 import 'auth/auth_scope.dart';
 import 'auth/token_storage.dart';
+import 'data/admin_suggestion_repository.dart';
 import 'data/database_helper.dart';
 import 'data/landmark_repository.dart';
+import 'data/notification_repository.dart';
 import 'data/suggestion_repository.dart';
 import 'services/image_quality_service.dart';
 import 'services/onnx_inference_service.dart';
@@ -40,9 +42,15 @@ void main() async {
   final authController = AuthController(
     storage: tokenStorage,
     backendClient: backendClient,
+    // 로그인/가입 시 기기 FCM 토큰을 함께 보내 알림 수신을 활성화.
+    pushTokenProvider: () => PushNotificationService.instance.token,
   );
   // 저장된 토큰을 확인해 로그인 상태를 복원.
   await authController.bootstrap();
+
+  // [김규현] FCM 토큰이 갱신되면(onTokenRefresh) 서버 push_token도 동기화.
+  PushNotificationService.instance.tokenStream
+      .listen(authController.syncPushToken);
 
   // [김규현] 건의 API 연동: 랜드마크 캐시 + 건의 레포.
   final landmarkRepository = LandmarkRepository(backendClient);
@@ -51,10 +59,16 @@ void main() async {
     landmarks: landmarkRepository,
   );
 
+  // [김규현] 알림함 + admin 건의 관리 레포지토리.
+  final notificationRepository = NotificationRepository(backendClient);
+  final adminSuggestionRepository = AdminSuggestionRepository(backendClient);
+
   runApp(LandmarkApp(
     apiClient: apiClient,
     authController: authController,
     suggestionRepository: suggestionRepository,
+    notificationRepository: notificationRepository,
+    adminSuggestionRepository: adminSuggestionRepository,
   ));
 }
 
@@ -62,12 +76,16 @@ class LandmarkApp extends StatelessWidget {
   final LocalApiClientImpl apiClient;
   final AuthController authController;
   final SuggestionRepository suggestionRepository;
+  final NotificationRepository notificationRepository;
+  final AdminSuggestionRepository adminSuggestionRepository;
 
   const LandmarkApp({
     super.key,
     required this.apiClient,
     required this.authController,
     required this.suggestionRepository,
+    required this.notificationRepository,
+    required this.adminSuggestionRepository,
   });
 
   @override
@@ -88,6 +106,8 @@ class LandmarkApp extends StatelessWidget {
           child: HomeScreen(
             apiClient: apiClient,
             suggestionRepository: suggestionRepository,
+            notificationRepository: notificationRepository,
+            adminSuggestionRepository: adminSuggestionRepository,
           ),
         ),
       ),

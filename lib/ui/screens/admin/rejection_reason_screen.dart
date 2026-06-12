@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../api/backend_client.dart';
+import '../../../data/admin_suggestion_repository.dart';
+
 const _bg = Color(0xFF121212);
 const _surface = Color(0xFF1E1E1E);
 const _accent = Color(0xFFE61E2B);
@@ -47,9 +50,17 @@ const List<RejectionReason> kRejectionReasons = [
 class RejectionReasonScreen extends StatefulWidget {
   const RejectionReasonScreen({
     super.key,
+    required this.suggestionId,
+    required this.repository,
     this.suggestionTitle = '사용자 건의',
     this.reasons = kRejectionReasons,
   });
+
+  /// 반려 처리할 건의 ID.
+  final String suggestionId;
+
+  /// 반려 API 호출에 사용할 레포지토리.
+  final AdminSuggestionRepository repository;
 
   /// 반려 대상 건의 제목(표시용).
   final String suggestionTitle;
@@ -64,6 +75,7 @@ class RejectionReasonScreen extends StatefulWidget {
 class _RejectionReasonScreenState extends State<RejectionReasonScreen> {
   RejectionReason? _selected;
   final _messageController = TextEditingController();
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -83,7 +95,7 @@ class _RejectionReasonScreenState extends State<RejectionReasonScreen> {
     });
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final message = _messageController.text.trim();
     if (_selected == null || message.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -94,14 +106,27 @@ class _RejectionReasonScreenState extends State<RejectionReasonScreen> {
       );
       return;
     }
-    // TODO(api): 반려 처리 API 연동(사유 라벨 + 메시지 전송).
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text("반려 처리되었습니다. (사유: ${_selected!.label})"),
-      ),
-    );
-    Navigator.of(context).maybePop();
+    FocusScope.of(context).unfocus();
+    setState(() => _submitting = true);
+    try {
+      await widget.repository.reject(widget.suggestionId, message);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text("반려 처리되었습니다. (사유: ${_selected!.label})"),
+        ),
+      );
+      // 목록 화면이 true 를 받아 새로고침하도록 결과값과 함께 닫는다.
+      Navigator.of(context).pop(true);
+    } on BackendException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(behavior: SnackBarBehavior.floating, content: Text(e.message)),
+      );
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   @override
@@ -211,12 +236,20 @@ class _RejectionReasonScreenState extends State<RejectionReasonScreen> {
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _accent,
+                    disabledBackgroundColor: _accent.withOpacity(0.4),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  onPressed: _submit,
-                  icon: const Icon(Icons.block, color: Colors.white, size: 20),
+                  onPressed: _submitting ? null : _submit,
+                  icon: _submitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2.5, color: Colors.white),
+                        )
+                      : const Icon(Icons.block, color: Colors.white, size: 20),
                   label: const Text('반려 처리',
                       style: TextStyle(
                           color: Colors.white,
