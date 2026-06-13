@@ -47,6 +47,15 @@ class ModelIntegrationContractTest(unittest.TestCase):
             with self.subTest(file_name=file_name):
                 self.assertTrue((ARTIFACT_DIR / file_name).exists())
 
+    def test_model_artifact_metadata_has_no_local_absolute_paths(self):
+        manifest_text = read_text("assets/mobile_artifacts_fp16/manifest.json")
+        sync_script = read_text("scripts/sync_model_artifacts.ps1")
+
+        local_path_pattern = re.compile(r"[A-Za-z]:\\|C:/Users|D:/|D:\\")
+        self.assertNotRegex(manifest_text, local_path_pattern)
+        self.assertNotRegex(sync_script, local_path_pattern)
+        self.assertIn("LANDMARK_MODEL_ARTIFACT_SOURCE", sync_script)
+
     def test_prototype_index_uses_embedding_schema_and_23_classes(self):
         manifest = load_json("assets/mobile_artifacts_fp16/manifest.json")
         prototype = load_json("assets/mobile_artifacts_fp16/prototype_index.json")

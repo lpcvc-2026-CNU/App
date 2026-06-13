@@ -1,7 +1,7 @@
 {
   "artifact_version": "landmark-assistant-mobileclip2-multitask-export-v1",
   "precision": "fp16",
-  "checkpoint": "D:\\mobileclip2_s3_server_full_ce_hardneg_fold3_20260611_214421\\best.pt",
+  "checkpoint": "mobileclip2_s3_server_full_ce_hardneg_fold3_20260611_214421/best.pt",
   "checkpoint_sha256": "ed52990c915453fbec2f99bd41383a88321fdf6dec3030f6ff0cf3be59886a1c",
   "model_id": "mobileclip2_s3_server_full_ce_hardneg",
   "model_name": "MobileCLIP2-S3",

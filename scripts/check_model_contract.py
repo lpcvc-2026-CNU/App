@@ -1,4 +1,5 @@
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -68,6 +69,16 @@ def required_manifest_files(manifest):
     return required
 
 
+def contains_local_absolute_path(value):
+    if isinstance(value, str):
+        return bool(re.search(r"[A-Za-z]:\\|C:/Users|D:/|D:\\", value))
+    if isinstance(value, dict):
+        return any(contains_local_absolute_path(item) for item in value.values())
+    if isinstance(value, list):
+        return any(contains_local_absolute_path(item) for item in value)
+    return False
+
+
 def main():
     errors = []
     warnings = []
@@ -109,6 +120,11 @@ def main():
     text_eval = load_json(text_eval_path)
 
     ok("manifest/classes/prototype/landmark_info loaded")
+
+    if contains_local_absolute_path(manifest):
+        fail(errors, "manifest.json contains a local absolute path; use repo-relative metadata instead")
+    else:
+        ok("manifest.json has no local absolute paths")
 
     for file_name in REQUIRED_BUNDLE_FILES:
         path = ARTIFACT_DIR / file_name

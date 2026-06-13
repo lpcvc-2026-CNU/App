@@ -1,5 +1,5 @@
 param(
-    [string]$SourceDir = "D:\mobileclip2_s3_server_full_ce_hardneg_fold3_20260611_214421\mobile_artifacts\fp16",
+    [string]$SourceDir = $env:LANDMARK_MODEL_ARTIFACT_SOURCE,
     [string]$TargetDir = "assets\mobile_artifacts_fp16"
 )
 
@@ -8,6 +8,10 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 if (-not [System.IO.Path]::IsPathRooted($TargetDir)) {
     $TargetDir = Join-Path $RepoRoot $TargetDir
+}
+
+if ([string]::IsNullOrWhiteSpace($SourceDir)) {
+    throw "Model artifact source directory is required. Pass -SourceDir or set LANDMARK_MODEL_ARTIFACT_SOURCE."
 }
 
 $requiredFiles = @(
@@ -55,6 +59,16 @@ foreach ($file in $requiredFiles) {
     Copy-Item -LiteralPath $sourcePath -Destination $targetPath -Force
     $size = (Get-Item -LiteralPath $targetPath).Length
     Write-Output ("[copied] {0} ({1:N0} bytes)" -f $file, $size)
+}
+
+$manifestPath = Join-Path $TargetDir "manifest.json"
+$manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+if ($manifest.PSObject.Properties.Name -contains "checkpoint") {
+    $artifactRunDir = Split-Path (Split-Path $SourceDir -Parent) -Parent
+    $artifactRunName = Split-Path $artifactRunDir -Leaf
+    $manifest.checkpoint = "$artifactRunName/best.pt"
+    $manifest | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+    Write-Output "[normalized] manifest checkpoint is repo-portable: $($manifest.checkpoint)"
 }
 
 Write-Output "[done] Model artifacts synced to $TargetDir"
