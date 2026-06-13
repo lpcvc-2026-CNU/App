@@ -9,12 +9,47 @@ import '../data/database_helper.dart';
 
 /// 온디바이스 시연 환경에 알맞게 보정 및 완화된 ConfidencePolicy 임계값 파라미터
 class _ConfidencePolicy {
-  static const double rejectThreshold            = 0.22; // FP16 모델 정밀도 회복에 따른 보정
-  static const double weakRejectThreshold        = 0.28;
-  static const double weakMargin                 = 0.08;
-  static const double matchThreshold             = 0.48; // FP16 매칭 활성화
-  static const double matchFloor                 = 0.38; 
-  static const double matchMargin                = 0.10; 
+  final double rejectThreshold;
+  final double weakRejectThreshold;
+  final double weakMargin;
+  final double matchThreshold;
+  final double matchFloor;
+  final double matchMargin;
+
+  const _ConfidencePolicy({
+    required this.rejectThreshold,
+    required this.weakRejectThreshold,
+    required this.weakMargin,
+    required this.matchThreshold,
+    required this.matchFloor,
+    required this.matchMargin,
+  });
+
+  static const defaults = _ConfidencePolicy(
+    rejectThreshold: 0.22,
+    weakRejectThreshold: 0.28,
+    weakMargin: 0.08,
+    matchThreshold: 0.48,
+    matchFloor: 0.38,
+    matchMargin: 0.10,
+  );
+
+  factory _ConfidencePolicy.fromJson(Map<String, dynamic> json) {
+    double readDouble(String key, double fallback) {
+      final value = json[key];
+      return value is num ? value.toDouble() : fallback;
+    }
+
+    return _ConfidencePolicy(
+      rejectThreshold: readDouble('reject_threshold', defaults.rejectThreshold),
+      weakRejectThreshold:
+          readDouble('weak_reject_threshold', defaults.weakRejectThreshold),
+      weakMargin: readDouble('weak_margin', defaults.weakMargin),
+      matchThreshold: readDouble('match_threshold', defaults.matchThreshold),
+      matchFloor: readDouble('match_floor', defaults.matchFloor),
+      matchMargin: readDouble('match_margin', defaults.matchMargin),
+    );
+  }
 }
 
 class LocalApiClientImpl implements LocalApiClient {
@@ -44,6 +79,21 @@ class LocalApiClientImpl implements LocalApiClient {
   // ── 프로토타입 캐시 ─────────────────────────────────────────────────────────
   List<String>? _landmarkIds;
   List<List<double>>? _protoMatrix; // (N, 512) – 각 행이 L2-정규화된 프로토타입
+  _ConfidencePolicy? _confidencePolicy;
+
+  Future<_ConfidencePolicy> _loadConfidencePolicy() async {
+    if (_confidencePolicy != null) return _confidencePolicy!;
+    try {
+      final jsonString = await rootBundle.loadString(
+        'assets/mobile_artifacts_fp16/confidence_policy.json',
+      );
+      final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
+      _confidencePolicy = _ConfidencePolicy.fromJson(jsonMap);
+    } catch (e) {
+      _confidencePolicy = _ConfidencePolicy.defaults;
+    }
+    return _confidencePolicy!;
+  }
 
   Future<void> _loadPrototypes() async {
     if (_protoMatrix != null) return;
@@ -144,6 +194,8 @@ class LocalApiClientImpl implements LocalApiClient {
       return {'decision': 'out_of_scope', 'reason_codes': ['no_candidate']};
     }
 
+    final policy = await _loadConfidencePolicy();
+
     final double top1Score = topResults[0]['raw_score'] as double;
     final double top2Score =
         topResults.length > 1 ? topResults[1]['raw_score'] as double : 0.0;
@@ -152,36 +204,42 @@ class LocalApiClientImpl implements LocalApiClient {
 
     String decision;
 
-    if (top1Score < _ConfidencePolicy.rejectThreshold) {
+    if (top1Score < policy.rejectThreshold) {
       // 1. Hard reject
       decision = 'out_of_scope';
       reasons.add('top1_below_reject');
-    } else if (top1Score < _ConfidencePolicy.weakRejectThreshold &&
-        margin < _ConfidencePolicy.weakMargin) {
+    } else if (top1Score < policy.weakRejectThreshold &&
+        margin < policy.weakMargin) {
       // 2. Weak reject
       decision = 'out_of_scope';
       reasons.addAll(['top1_weak', 'margin_low']);
-    } else if (top1Score >= _ConfidencePolicy.matchThreshold) {
+    } else if (top1Score >= policy.matchThreshold) {
       // 3. Strong match
       decision = 'matched';
       reasons.add('top1_high');
-    } else if (top1Score >= _ConfidencePolicy.matchFloor &&
-        margin >= _ConfidencePolicy.matchMargin) {
+    } else if (top1Score >= policy.matchFloor &&
+        margin >= policy.matchMargin) {
       // 4. Mid match with sufficient margin
       decision = 'matched';
       reasons.addAll(['top1_mid', 'margin_high']);
     } else {
       // 5. Ambiguous
       decision = 'ambiguous';
-      if (top1Score < _ConfidencePolicy.matchThreshold) {
+      if (top1Score < policy.matchThreshold) {
         reasons.add('top1_below_match');
       }
-      if (margin < _ConfidencePolicy.matchMargin) {
+      if (margin < policy.matchMargin) {
         reasons.add('margin_low');
       }
     }
 
-    return {'decision': decision, 'reason_codes': reasons};
+    return {
+      'decision': decision,
+      'reason_codes': reasons,
+      'top1_score': top1Score,
+      'top2_score': top2Score,
+      'margin': margin,
+    };
   }
 
   @override

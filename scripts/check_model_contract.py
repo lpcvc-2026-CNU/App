@@ -16,6 +16,7 @@ REQUIRED_BUNDLE_FILES = (
     "tokenizer.json",
     "labels_master.json",
     "config.yaml",
+    "confidence_policy.json",
 )
 
 
