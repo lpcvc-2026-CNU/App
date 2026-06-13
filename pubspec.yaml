@@ -41,4 +41,5 @@ flutter:
   assets:
     - assets/
     - assets/mobile_artifacts_int8/
+    - assets/mobile_artifacts_fp16/
     - assets/hero_images/

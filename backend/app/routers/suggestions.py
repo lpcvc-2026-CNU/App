@@ -52,14 +52,19 @@ def create_suggestion(
                 detail=f"이미 등록되어 있는 랜드마크입니다. (공식 명칭: {lm.name_ko})"
             )
 
-    # 3. 이미 제출되어 대기(pending) 중이거나 승인(approved)된 건의 목록과 대조 검증
+    # 3. 이미 제출되어 대기(pending), 승인(approved), 완료(completed) 된 건의 목록과 대조 검증
     existing_suggestions = db.query(Suggestion).filter(
-        Suggestion.status.in_(["pending", "approved"])
+        Suggestion.status.in_(["pending", "approved", "completed"])
     ).all()
     for sug in existing_suggestions:
         sug_name = "".join(sug.landmark_name.split()).lower()
         if normalized_input == sug_name:
-            status_desc = "검토 대기 중" if sug.status == "pending" else "이미 추가 승인됨"
+            status_map = {
+                "pending": "검토 대기 중",
+                "approved": "이미 추가 승인됨",
+                "completed": "추가 완료됨"
+            }
+            status_desc = status_map.get(sug.status, sug.status)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"이미 동일한 건의 사항이 존재합니다. ({status_desc})"
@@ -106,7 +111,14 @@ def update_suggestion_status(
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
-    """개발자(관리자)용 건의 사항 상태 변경 (승인/반려 처리)"""
+    """개발자(관리자)용 건의 사항 상태 변경 (승인/반려/완료 처리)"""
+    # 1. 상태 값 유효성 검사
+    if payload.status not in ["approved", "rejected", "completed"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="유효하지 않은 건의 상태입니다. (approved, rejected, completed만 허용)"
+        )
+
     suggestion = db.query(Suggestion).filter(Suggestion.id == suggestion_id).first()
     if not suggestion:
         raise HTTPException(
@@ -123,7 +135,7 @@ def update_suggestion_status(
             )
         suggestion.rejection_reason = payload.rejection_reason.strip()
     else:
-        # approved 등 반려가 아닌 상태로 전환될 시 사유는 초기화
+        # approved, completed 등 반려가 아닌 상태로 전환될 시 사유는 초기화
         suggestion.rejection_reason = None
 
     suggestion.status = payload.status
@@ -139,6 +151,9 @@ def update_suggestion_status(
     elif suggestion.status == "rejected":
         title = "랜드마크 건의 반려"
         body = f"제안하신 '{suggestion.landmark_name}' 건의가 반려되었습니다. 사유: {suggestion.rejection_reason}"
+    elif suggestion.status == "completed":
+        title = "랜드마크 추가 완료"
+        body = f"제안하신 '{suggestion.landmark_name}' 건의에 따른 랜드마크 추가 작업이 완료되었습니다."
 
     if title and body:
         # DB 알림 내역 저장

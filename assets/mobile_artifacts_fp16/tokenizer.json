@@ -1,0 +1,7 @@
+{
+  "model_name": "MobileCLIP2-S3",
+  "input_name": "text_tokens",
+  "input_dtype": "int64",
+  "context_length": 77,
+  "note": "Use the same open_clip tokenizer for this model_name before running the exported text encoder ONNX."
+}

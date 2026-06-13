@@ -21,14 +21,14 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
   }
 
   Future _createDB(Database db, int version) async {
-    // Landmarks 테이블: 다국어(name_zh, name_ja, description_en, description_zh, description_ja) 컬럼 추가
+    // Landmarks 테이블: 다국어 및 parent_landmark_id 컬럼 추가
     await db.execute('''
       CREATE TABLE landmarks (
         id TEXT PRIMARY KEY,
@@ -43,6 +43,7 @@ class DatabaseHelper {
         description_ja TEXT,
         latitude REAL CHECK (latitude >= -90.0 AND latitude <= 90.0),
         longitude REAL CHECK (longitude >= -180.0 AND longitude <= 180.0),
+        parent_landmark_id TEXT,
         UNIQUE(name_ko, district)
       )
     ''');
@@ -59,7 +60,7 @@ class DatabaseHelper {
       )
     ''');
 
-    // Search_Logs 테이블
+    // Search_Logs 테이블: P2 디버깅 로그 필드 대폭 확장
     await db.execute('''
       CREATE TABLE search_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,13 +69,18 @@ class DatabaseHelper {
         top1_id TEXT,
         decision TEXT,
         reason_codes TEXT,
-        latency_ms INTEGER
+        latency_ms INTEGER,
+        model_version TEXT,
+        backend TEXT,
+        top3_scores TEXT,
+        margin REAL,
+        decision_status TEXT
       )
     ''');
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 3) {
+    if (oldVersion < 5) {
       await db.execute('DROP TABLE IF EXISTS candidate_texts');
       await db.execute('DROP TABLE IF EXISTS landmarks');
       await db.execute('DROP TABLE IF EXISTS search_logs');
@@ -131,6 +137,7 @@ class DatabaseHelper {
         'description_ja': item['description_ja'],
         'latitude': item['latitude'],
         'longitude': item['longitude'],
+        'parent_landmark_id': item['parent_landmark_id'],
       }, conflictAlgorithm: ConflictAlgorithm.ignore);
       
       // Alias를 candidate_texts로 등록

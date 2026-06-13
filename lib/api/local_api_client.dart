@@ -6,6 +6,10 @@ abstract class LocalApiClient {
   String get languageCode;
   set languageCode(String code);
 
+  /// 모델 사양 불일치 시 개발자 경고 알림 문구 (null이면 정상)
+  String? get modelSpecWarning;
+
+
   /// 통합 검색 파이프라인
   Future<Map<String, dynamic>> search(Uint8List imageBytes, {String? textQuery});
   

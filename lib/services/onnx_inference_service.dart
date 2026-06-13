@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -12,24 +13,25 @@ class OnnxInferenceService {
     'landmark_demo_app/onnx_assets',
   );
 
-  static const double _resizeScale = 1.15;
-  static const int _imageSize = 224;
-  static const List<double> _mean = [0.48145466, 0.4578275, 0.40821073];
-  static const List<double> _std = [0.26862954, 0.26130258, 0.27577711];
+  double _resizeScale = 1.15;
+  int _imageSize = 224;
+  List<double> _mean = const [0.48145466, 0.4578275, 0.40821073];
+  List<double> _std = const [0.26862954, 0.26130258, 0.27577711];
 
-  static const String _modelAssetPath =
-      'assets/mobile_artifacts_int8/landmark_encoder.onnx';
-  static const String _dataAssetPath =
-      'assets/mobile_artifacts_int8/landmark_encoder.onnx.data';
-  static const String _modelFileName = 'landmark_encoder.onnx';
-  static const String _dataFileName = 'landmark_encoder.onnx.data';
+  static const String _manifestAssetPath =
+      'assets/mobile_artifacts_fp16/manifest.json';
+  static const String _assetDir = 'assets/mobile_artifacts_fp16';
 
-  OrtSession? _session;
+  OrtSession? _imageSession;
+  OrtSession? _textSession;
   Future<void>? _initializing;
   String? _lastInitError;
+  String? _modelSpecWarning;
+
+  String? get modelSpecWarning => _modelSpecWarning;
 
   Future<void> initializeOnnxModel() async {
-    if (_session != null) return;
+    if (_imageSession != null) return;
     if (_initializing != null) return _initializing!;
 
     _initializing = _initializeInternal();
@@ -41,65 +43,128 @@ class OnnxInferenceService {
   }
 
   Future<void> _initializeInternal() async {
-    OrtSessionOptions? sessionOptions;
+    OrtSessionOptions? imageSessionOptions;
+    OrtSessionOptions? textSessionOptions;
     try {
       _lastInitError = null;
       OrtEnv.instance.init();
+      
+      // preprocessing.json 동적 파싱 로드 (P2)
+      await _loadPreprocessingConfig();
 
-      sessionOptions = OrtSessionOptions();
-      sessionOptions.setInterOpNumThreads(1);
-      sessionOptions.setIntraOpNumThreads(2);
-      sessionOptions.setSessionGraphOptimizationLevel(
+      imageSessionOptions = OrtSessionOptions();
+      imageSessionOptions.setInterOpNumThreads(1);
+      imageSessionOptions.setIntraOpNumThreads(2);
+      imageSessionOptions.setSessionGraphOptimizationLevel(
         GraphOptimizationLevel.ortEnableAll,
       );
 
-      final modelFile = await _prepareModelFiles();
-      _session = OrtSession.fromFile(modelFile, sessionOptions);
-      print('ONNX session initialized: ${modelFile.path}');
+      textSessionOptions = OrtSessionOptions();
+      textSessionOptions.setInterOpNumThreads(1);
+      textSessionOptions.setIntraOpNumThreads(2);
+      textSessionOptions.setSessionGraphOptimizationLevel(
+        GraphOptimizationLevel.ortEnableAll,
+      );
+
+      final preparedFiles = await _prepareModelFiles();
+      
+      _imageSession = OrtSession.fromFile(
+        File(preparedFiles['modelPath']!),
+        imageSessionOptions,
+      );
+      
+      // text encoder 세션 로드 준비
+      _textSession = OrtSession.fromFile(
+        File(preparedFiles['textModelPath']!),
+        textSessionOptions,
+      );
+
+      print('ONNX sessions initialized: Image=${preparedFiles['modelPath']}, Text=${preparedFiles['textModelPath']}');
+      
+      // 모델 메타데이터 스펙 정합성 검증 레이어 탑재 (P2)
+      await _verifyModelMetadata();
     } catch (e, stackTrace) {
       _lastInitError = e.toString();
       print('ONNX initialization failed: $e');
       print(stackTrace);
       rethrow;
     } finally {
-      sessionOptions?.release();
+      imageSessionOptions?.release();
+      textSessionOptions?.release();
     }
   }
 
-  Future<File> _prepareModelFiles() async {
+  Future<Map<String, String>> _prepareModelFiles() async {
     if (Platform.isAndroid) {
       final result =
           await _assetChannel.invokeMapMethod<String, String>(
             'prepareOnnxAssets',
           ) ??
           const {};
+      
       final modelPath = result['modelPath'];
-      if (modelPath == null || modelPath.isEmpty) {
-        throw Exception('Android asset preparation returned no model path');
+      final dataPath = result['dataPath'];
+      final textModelPath = result['textModelPath'];
+      final textDataPath = result['textDataPath'];
+
+      if (modelPath == null || modelPath.isEmpty ||
+          dataPath == null || dataPath.isEmpty ||
+          textModelPath == null || textModelPath.isEmpty ||
+          textDataPath == null || textDataPath.isEmpty) {
+        throw Exception('Android asset preparation returned incomplete paths');
       }
 
-      final modelFile = File(modelPath);
-      final dataPath = result['dataPath'];
-      if (!await modelFile.exists()) {
-        throw Exception('Prepared ONNX model file is missing: $modelPath');
+      if (!await File(modelPath).exists() || !await File(dataPath).exists() ||
+          !await File(textModelPath).exists() || !await File(textDataPath).exists()) {
+        throw Exception('Prepared ONNX files are missing on Android filesystem');
       }
-      if (dataPath == null || !(await File(dataPath).exists())) {
-        throw Exception('Prepared ONNX external data file is missing');
-      }
-      return modelFile;
+
+      return {
+        'modelPath': modelPath,
+        'dataPath': dataPath,
+        'textModelPath': textModelPath,
+        'textDataPath': textDataPath,
+      };
     }
+
+    // iOS or Desktop fallback path using manifest
+    final manifestContent = await rootBundle.loadString(_manifestAssetPath);
+    final manifest = json.decode(manifestContent) as Map<String, dynamic>;
+
+    final imageInfo = manifest['image_encoder'] as Map<String, dynamic>;
+    final imgOnnxName = imageInfo['onnx'] as String;
+    final imgDataName = imageInfo['external_data'] as String;
+
+    final textInfo = manifest['text_encoder'] as Map<String, dynamic>;
+    final txtOnnxName = textInfo['onnx'] as String;
+    final txtDataName = textInfo['external_data'] as String;
 
     final appDir = await getApplicationDocumentsDirectory();
-    final modelFile = File('${appDir.path}/$_modelFileName');
-    final dataFile = File('${appDir.path}/$_dataFileName');
+    
+    final imgModelFile = File('${appDir.path}/$imgOnnxName');
+    final imgDataFile = File('${appDir.path}/$imgDataName');
+    final txtModelFile = File('${appDir.path}/$txtOnnxName');
+    final txtDataFile = File('${appDir.path}/$txtDataName');
 
-    if (!await modelFile.exists()) {
-      await _copyAsset(_modelAssetPath, modelFile);
+    if (!await imgModelFile.exists()) {
+      await _copyAsset('$_assetDir/$imgOnnxName', imgModelFile);
     }
-    if (!await dataFile.exists()) {
-      await _copyAsset(_dataAssetPath, dataFile);
+    if (!await imgDataFile.exists()) {
+      await _copyAsset('$_assetDir/$imgDataName', imgDataFile);
     }
-    return modelFile;
+    if (!await txtModelFile.exists()) {
+      await _copyAsset('$_assetDir/$txtOnnxName', txtModelFile);
+    }
+    if (!await txtDataFile.exists()) {
+      await _copyAsset('$_assetDir/$txtDataName', txtDataFile);
+    }
+
+    return {
+      'modelPath': imgModelFile.path,
+      'dataPath': imgDataFile.path,
+      'textModelPath': txtModelFile.path,
+      'textDataPath': txtDataFile.path,
+    };
   }
 
   Future<void> _copyAsset(String assetPath, File destination) async {
@@ -109,17 +174,19 @@ class OnnxInferenceService {
   }
 
   void release() {
-    _session?.release();
-    _session = null;
+    _imageSession?.release();
+    _imageSession = null;
+    _textSession?.release();
+    _textSession = null;
     OrtEnv.instance.release();
   }
 
-  bool get isInitialized => _session != null;
+  bool get isInitialized => _imageSession != null;
   String? get lastInitError => _lastInitError;
 
   Future<List<double>> extractEmbedding(Uint8List imageBytes) async {
     await initializeOnnxModel();
-    if (_session == null) {
+    if (_imageSession == null) {
       throw Exception(_lastInitError ?? 'Session not initialized');
     }
 
@@ -156,7 +223,7 @@ class OnnxInferenceService {
       height: _imageSize,
     );
 
-    const numPixels = _imageSize * _imageSize;
+    final numPixels = _imageSize * _imageSize;
     final float32Data = Float32List(3 * numPixels);
 
     for (var cy = 0; cy < _imageSize; cy++) {
@@ -176,7 +243,7 @@ class OnnxInferenceService {
     final tensor = OrtValueTensor.createTensorWithDataList(float32Data, shape);
     final runOptions = OrtRunOptions();
 
-    final outputs = _session!.run(runOptions, {'image': tensor});
+    final outputs = _imageSession!.run(runOptions, {'image': tensor});
     final outputTensor = outputs[0]?.value as List<dynamic>;
 
     tensor.release();
@@ -207,5 +274,72 @@ class OnnxInferenceService {
       return values;
     }
     return values.map((value) => value / norm).toList();
+  }
+
+  Future<void> _loadPreprocessingConfig() async {
+    try {
+      final jsonString = await rootBundle.loadString('assets/mobile_artifacts_fp16/preprocessing.json');
+      final Map<String, dynamic> config = json.decode(jsonString);
+      
+      _imageSize = config['image_size'] as int? ?? 224;
+      
+      final meanList = config['image_mean'] ?? config['mean'];
+      if (meanList is List) {
+        _mean = meanList.map((e) => (e as num).toDouble()).toList();
+      }
+      
+      final stdList = config['image_std'] ?? config['std'];
+      if (stdList is List) {
+        _std = stdList.map((e) => (e as num).toDouble()).toList();
+      }
+
+      _resizeScale = (config['resize_short_side_scale'] ?? config['resize_scale'] as num?)?.toDouble() ?? 1.15;
+      
+      print('ONNX preprocessing configured: Size=$_imageSize, Mean=$_mean, Std=$_std, Scale=$_resizeScale');
+    } catch (e) {
+      print('Failed to load preprocessing config, using fallback: $e');
+    }
+  }
+
+  Future<void> _verifyModelMetadata() async {
+    try {
+      final manifestContent = await rootBundle.loadString(_manifestAssetPath);
+      final manifest = json.decode(manifestContent) as Map<String, dynamic>;
+
+      final String modelId = manifest['model_id'] as String? ?? '';
+      final String precision = manifest['precision'] as String? ?? '';
+      final int classCount = manifest['class_count'] as int? ?? 0;
+
+      // 앱이 기대하는 스펙 (classes.json 기준 23개 클래스 ID)
+      const String expectedModelId = 'mobileclip2_s3_server_full_ce_hardneg';
+      const String expectedPrecision = 'fp16';
+      const int expectedClassCount = 23;
+
+      List<String> mismatches = [];
+
+      if (modelId != expectedModelId) {
+        mismatches.add('Model ID Mismatch: Expected $expectedModelId, Got $modelId');
+      }
+      if (precision != expectedPrecision) {
+        mismatches.add('Precision Mismatch: Expected $expectedPrecision, Got $precision');
+      }
+      if (classCount != expectedClassCount) {
+        mismatches.add('Class Count Mismatch: Expected $expectedClassCount, Got $classCount');
+      }
+
+      if (mismatches.isNotEmpty) {
+        final warningMsg = 'Model Spec Mismatch: ${mismatches.join(", ")}';
+        print('⚠️ [WARNING] ONNX MODEL SPECS MISMATCH DETECTED:');
+        for (var m in mismatches) {
+          print('  - $m');
+        }
+        _modelSpecWarning = warningMsg;
+      } else {
+        _modelSpecWarning = null;
+        print('✅ ONNX model metadata verified successfully. Spec matches: $expectedModelId, $expectedPrecision, $expectedClassCount classes.');
+      }
+    } catch (e) {
+      print('Failed to verify model metadata: $e');
+    }
   }
 }

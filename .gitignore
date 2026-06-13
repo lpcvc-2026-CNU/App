@@ -55,8 +55,15 @@ app.*.map.json
 # Large model files (ignored)
 assets/mobile_artifacts_int8/*.onnx
 assets/mobile_artifacts_int8/*.onnx.data
+assets/mobile_artifacts_fp16/*.onnx
+assets/mobile_artifacts_fp16/*.onnx.data
 *.pt
 best.pt
+
+# Firebase configurations (ignored)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
 
 # Python cache
 __pycache__/

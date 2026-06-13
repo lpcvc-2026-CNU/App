@@ -43,7 +43,11 @@ class DetailScreen extends StatelessWidget {
           }
 
           final data = snapshot.data ?? {};
-          final name = (data['name'] ?? landmarkId).toString();
+          final rawName = (data['name'] ?? landmarkId).toString();
+          final parentName = data['parent_name'] as String?;
+          final name = (parentName != null && parentName.isNotEmpty)
+              ? '$parentName · $rawName'
+              : rawName;
           final district = (data['district'] ?? 'District').toString();
 
           return SafeArea(

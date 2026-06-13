@@ -14,6 +14,7 @@ android {
     packaging {
         jniLibs {
             useLegacyPackaging = true
+            pickFirsts += "**/libonnxruntime.so"
         }
     }
 
@@ -50,6 +51,11 @@ android {
     }
 }
 
+dependencies {
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.16.0")
+}
+
 flutter {
     source = "../.."
 }
+

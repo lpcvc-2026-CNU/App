@@ -57,6 +57,48 @@ class _HomeScreenState extends State<HomeScreen>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkModelSpecWarning();
+    });
+  }
+
+  void _checkModelSpecWarning() {
+    final warning = widget.apiClient.modelSpecWarning;
+    if (warning != null && warning.isNotEmpty) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF1E1E1E),
+            title: const Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 28),
+                SizedBox(width: 8),
+                Text(
+                  '개발자 경고: 모델 스펙 불일치',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ],
+            ),
+            content: Text(
+              '$warning\n\n실제 모델의 메타데이터 정보가 앱이 정상 동작하기 위해 요구하는 스펙과 다릅니다. 에셋의 manifest.json 사양을 확인해 주세요.',
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  '확인 (무시)',
+                  style: TextStyle(color: Color(0xFFE61E2B), fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override

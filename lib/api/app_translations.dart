@@ -36,7 +36,8 @@ class AppTranslations {
       'text_search_input_hint': '랜드마크 키워드를 입력하세요',
       'no_search_result': '일치하는 랜드마크가 없습니다.',
       'no_search_result_desc': '다른 키워드나 랜드마크 이름으로 시도해 보세요.',
-      'enter_query_prompt': '검색어를 입력해 주세요.'
+      'enter_query_prompt': '검색어를 입력해 주세요.',
+      'similarity': '유사도'
     },
     'en': {
       'app_title': 'Seoul Landmark Assistant',
@@ -74,7 +75,8 @@ class AppTranslations {
       'text_search_input_hint': 'Enter a landmark keyword',
       'no_search_result': 'No matching landmark was found.',
       'no_search_result_desc': 'Try a different keyword or landmark name.',
-      'enter_query_prompt': 'Enter a query to search.'
+      'enter_query_prompt': 'Enter a query to search.',
+      'similarity': 'Similarity'
     },
     'zh': {
       'app_title': '首尔地标助手',
@@ -112,7 +114,8 @@ class AppTranslations {
       'text_search_input_hint': '请输入地标关键字',
       'no_search_result': '未找到匹配的地标。',
       'no_search_result_desc': '请尝试输入其他关键字或地标名称。',
-      'enter_query_prompt': '请输入搜索词进行检索。'
+      'enter_query_prompt': '请输入搜索词进行检索。',
+      'similarity': '相似度'
     },
     'ja': {
       'app_title': 'ソウルランドマークアシスタント',
@@ -150,7 +153,8 @@ class AppTranslations {
       'text_search_input_hint': 'ランドマークのキーワードを入力してください',
       'no_search_result': '一致するランドマークが見つかりませんでした。',
       'no_search_result_desc': '別のキーワードやランドマーク名でお試しください。',
-      'enter_query_prompt': '検索ワードを入力してください。'
+      'enter_query_prompt': '検索ワードを入力してください。',
+      'similarity': '類似度'
     }
   };
 

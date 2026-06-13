@@ -312,15 +312,21 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
   }
 
   Widget _buildLandmarkCard(Map<String, dynamic> candidate) {
+    final lang = widget.apiClient?.languageCode ?? 'ko';
     final landmarkId = candidate['landmark_id'].toString();
-    final percentage = (candidate['percentage'] as num?)?.toInt() ?? 0;
+    final displayScore = (candidate['display_score'] as num?)?.toInt() ?? 
+                         ((candidate['keyword_score'] as num?) != null ? ((candidate['keyword_score'] as num) * 100).toInt() : 0);
 
     return FutureBuilder<Map<String, dynamic>>(
       future: widget.apiClient?.getLandmarkDetails(landmarkId),
       builder: (context, snapshot) {
         final data = snapshot.data ?? {};
         // API 레벨에서 바인딩된 name 및 description 공통 다국어 프로퍼티 사용
-        final name = (data['name'] ?? landmarkId).toString();
+        final rawName = (data['name'] ?? landmarkId).toString();
+        final parentName = data['parent_name'] as String?;
+        final name = (parentName != null && parentName.isNotEmpty)
+            ? '$parentName · $rawName'
+            : rawName;
         final desc = data['description']?.toString();
 
         return GestureDetector(
@@ -353,12 +359,12 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                                 Icons.image_outlined,
                                 size: 50,
                                 color: Colors.white30,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
                     Positioned(
                       top: 14,
                       right: 14,
@@ -372,7 +378,7 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          '$percentage%',
+                          '${AppTranslations.translate('similarity', lang)} $displayScore',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,

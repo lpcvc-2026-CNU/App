@@ -34,32 +34,68 @@ class MainActivity : FlutterActivity() {
 
     private fun prepareOnnxAssets(): Map<String, String> {
         val flutterLoader = FlutterInjector.instance().flutterLoader()
-        val modelAssetPath = flutterLoader.getLookupKeyForAsset(
-            "assets/mobile_artifacts_int8/landmark_encoder.onnx"
+        val manifestAssetKey = flutterLoader.getLookupKeyForAsset(
+            "assets/mobile_artifacts_fp16/manifest.json"
         )
-        val dataAssetPath = flutterLoader.getLookupKeyForAsset(
-            "assets/mobile_artifacts_int8/landmark_encoder.onnx.data"
-        )
+
+        // Read manifest.json from assets
+        val manifestContent = assets.open(manifestAssetKey).bufferedReader().use { it.readText() }
+        val json = org.json.JSONObject(manifestContent)
+        
+        val imageEncoderObj = json.getJSONObject("image_encoder")
+        val imgOnnxName = imageEncoderObj.getString("onnx")
+        val imgDataName = imageEncoderObj.getString("external_data")
+        
+        val textEncoderObj = json.getJSONObject("text_encoder")
+        val txtOnnxName = textEncoderObj.getString("onnx")
+        val txtDataName = textEncoderObj.getString("external_data")
 
         val targetDir = File(filesDir, "onnx_assets")
         if (!targetDir.exists()) {
             targetDir.mkdirs()
         }
 
-        val modelFile = File(targetDir, "landmark_encoder.onnx")
-        val dataFile = File(targetDir, "landmark_encoder.onnx.data")
-        val readyFile = File(targetDir, ".ready")
+        // Define files to copy
+        val filesToCopy = listOf(
+            imgOnnxName,
+            imgDataName,
+            txtOnnxName,
+            txtDataName
+        )
 
-        if (!readyFile.exists() || !modelFile.exists() || !dataFile.exists()) {
-            copyAssetStream(modelAssetPath, modelFile)
-            copyAssetStream(dataAssetPath, dataFile)
-            readyFile.writeText("ready")
+        val pathsMap = mutableMapOf<String, String>()
+        
+        for (fileName in filesToCopy) {
+            val assetPath = "assets/mobile_artifacts_fp16/$fileName"
+            val assetKey = flutterLoader.getLookupKeyForAsset(assetPath)
+            val destinationFile = File(targetDir, fileName)
+            
+            // Check if file needs copying (check existence and size mismatch for cache invalidation)
+            val assetFd = try {
+                assets.openFd(assetKey)
+            } catch (e: Exception) {
+                null
+            }
+
+            val needsCopy = if (assetFd != null) {
+                !destinationFile.exists() || destinationFile.length() != assetFd.length
+            } else {
+                !destinationFile.exists()
+            }
+            
+            assetFd?.close()
+
+            if (needsCopy) {
+                copyAssetStream(assetKey, destinationFile)
+            }
         }
 
-        return mapOf(
-            "modelPath" to modelFile.absolutePath,
-            "dataPath" to dataFile.absolutePath
-        )
+        pathsMap["modelPath"] = File(targetDir, imgOnnxName).absolutePath
+        pathsMap["dataPath"] = File(targetDir, imgDataName).absolutePath
+        pathsMap["textModelPath"] = File(targetDir, txtOnnxName).absolutePath
+        pathsMap["textDataPath"] = File(targetDir, txtDataName).absolutePath
+
+        return pathsMap
     }
 
     private fun copyAssetStream(assetPath: String, destination: File) {

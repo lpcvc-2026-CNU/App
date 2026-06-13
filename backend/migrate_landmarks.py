@@ -54,7 +54,8 @@ def migrate_data():
                 description_zh=item.get("description_zh"),
                 description_ja=item.get("description_ja"),
                 latitude=Decimal(str(item["latitude"])),
-                longitude=Decimal(str(item["longitude"]))
+                longitude=Decimal(str(item["longitude"])),
+                parent_landmark_id=item.get("parent_landmark_id")
             )
             db.add(landmark)
         

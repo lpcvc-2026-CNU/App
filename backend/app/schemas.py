@@ -59,11 +59,13 @@ class SuggestionCreate(BaseModel):
     description: str = Field(..., min_length=1, description="랜드마크에 대한 간단한 설명")
 
 class SuggestionStatusUpdate(BaseModel):
-    status: str = Field(..., description="변경할 상태 ('approved' 또는 'rejected')")
+    status: str = Field(..., description="변경할 상태 ('approved', 'rejected', 'completed')")
     rejection_reason: Optional[str] = Field(None, description="반려 사유 (rejected일 경우 필수)")
 
     @model_validator(mode="after")
     def check_rejection_reason(self) -> "SuggestionStatusUpdate":
+        if self.status not in ["approved", "rejected", "completed"]:
+            raise ValueError("status는 'approved', 'rejected', 'completed' 중 하나여야 합니다.")
         if self.status == "rejected":
             if not self.rejection_reason or not self.rejection_reason.strip():
                 raise ValueError("반려 상태로 변경 시 반려 사유(rejection_reason)는 필수이며 비어있을 수 없습니다.")
@@ -96,4 +98,40 @@ class NotificationResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        from_attributes = True
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. 검색 로그 관련 스키마 (Search Log Schemas)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class SearchLogCreate(BaseModel):
+    timestamp: str = Field(..., description="로그 기록 일시 (ISO 형식)")
+    query_type: str = Field(..., description="검색 쿼리 타입 (image, text)")
+    top1_id: Optional[str] = Field(None, description="탑 1 결과 랜드마크 ID")
+    decision: Optional[str] = Field(None, description="결정 유형")
+    reason_codes: Optional[str] = Field(None, description="결정 이유 코드")
+    latency_ms: Optional[int] = Field(None, description="소요 시간 (ms)")
+    model_version: Optional[str] = Field(None, description="모델 버전")
+    backend: Optional[str] = Field(None, description="백엔드 유형")
+    top3_scores: Optional[str] = Field(None, description="Top 3 결과 및 점수")
+    margin: Optional[float] = Field(None, description="Margin 점수 차이")
+    decision_status: Optional[str] = Field(None, description="최종 결정 상태")
+
+class SearchLogResponse(BaseModel):
+    id: int
+    timestamp: str
+    query_type: str
+    top1_id: Optional[str] = None
+    decision: Optional[str] = None
+    reason_codes: Optional[str] = None
+    latency_ms: Optional[int] = None
+    model_version: Optional[str] = None
+    backend: Optional[str] = None
+    top3_scores: Optional[str] = None
+    margin: Optional[float] = None
+    decision_status: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
