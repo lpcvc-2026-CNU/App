@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../api/backend_client.dart';
 import 'token_storage.dart';
 
 /// 인증 상태.
@@ -32,9 +33,14 @@ class AuthUser {
 /// 아래 `// TODO(api):` 지점이 API 연동 포인트이며, 현재는 UI/상태 흐름을
 /// 검증하기 위한 목(mock) 동작으로 처리한다.
 class AuthController extends ChangeNotifier {
-  AuthController({required TokenStorage storage}) : _storage = storage;
+  AuthController({
+    required TokenStorage storage,
+    required BackendClient backendClient,
+  })  : _storage = storage,
+        _backend = backendClient;
 
   final TokenStorage _storage;
+  final BackendClient _backend;
 
   AuthStatus _status = AuthStatus.unknown;
   AuthStatus get status => _status;
@@ -49,12 +55,34 @@ class AuthController extends ChangeNotifier {
 
   bool get isAuthenticated => _status == AuthStatus.authenticated;
 
-  /// 앱 시작 시 호출. 저장된 토큰이 있으면 로그인 상태로 복원한다.
+  /// 앱 시작 시 호출. 저장된 토큰을 서버로 검증해 로그인 상태를 복원한다.
+  ///
+  /// 토큰 존재 여부만 보지 않고 `/api/auth/me` 로 실제 유효성을 확인한다.
+  /// (구 빌드의 mock 토큰이나 만료 토큰이 남아 인증 상태로 오인되는 것을 방지)
   Future<void> bootstrap() async {
     final token = await _storage.readAccessToken();
-    _status = (token != null && token.isNotEmpty)
-        ? AuthStatus.authenticated
-        : AuthStatus.unauthenticated;
+    if (token == null || token.isEmpty) {
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return;
+    }
+    try {
+      final me = await _backend.getJson('/api/auth/me', auth: true);
+      _user = AuthUser(
+        email: (me['email'] ?? '') as String,
+        nickname: me['nickname'] as String?,
+      );
+      _status = AuthStatus.authenticated;
+    } on BackendException catch (e) {
+      if (e.isUnauthorized) {
+        // 무효 토큰(만료/위조/구 mock) → 정리 후 로그인 화면으로.
+        await _storage.clear();
+        _status = AuthStatus.unauthenticated;
+      } else {
+        // 네트워크 일시 오류: 토큰은 유지하고 인증 상태로 낙관 복원.
+        _status = AuthStatus.authenticated;
+      }
+    }
     notifyListeners();
   }
 
@@ -64,12 +92,12 @@ class AuthController extends ChangeNotifier {
     required String password,
   }) async {
     return _run(() async {
-      // TODO(api): 김민재 님 Auth API(POST /auth/login) 연동.
-      //   응답으로 받은 accessToken/refreshToken 을 저장한다.
-      await Future<void>.delayed(const Duration(milliseconds: 600));
-      const fakeToken = 'mock-access-token';
-      await _storage.saveAccessToken(fakeToken);
-      _user = AuthUser(email: email);
+      final res = await _backend.postJson(
+        '/api/auth/login',
+        {'email': email, 'password': password},
+      );
+      await _storage.saveAccessToken(res['access_token'] as String);
+      _user = AuthUser(email: email, nickname: res['nickname'] as String?);
       _status = AuthStatus.authenticated;
     });
   }
@@ -81,29 +109,39 @@ class AuthController extends ChangeNotifier {
     String? nickname,
   }) async {
     return _run(() async {
-      // TODO(api): 김민재 님 Auth API(POST /auth/signup) 연동.
-      await Future<void>.delayed(const Duration(milliseconds: 600));
-      const fakeToken = 'mock-access-token';
-      await _storage.saveAccessToken(fakeToken);
-      _user = AuthUser(email: email, nickname: nickname);
+      // nickname 미입력 시 이메일 로컬파트를 기본값으로 사용(백엔드 min_length=1 충족).
+      final effectiveNickname =
+          (nickname == null || nickname.isEmpty) ? email.split('@').first : nickname;
+      await _backend.postJson(
+        '/api/auth/register',
+        {'email': email, 'password': password, 'nickname': effectiveNickname},
+      );
+      // 가입 성공 후 자동 로그인.
+      final res = await _backend.postJson(
+        '/api/auth/login',
+        {'email': email, 'password': password},
+      );
+      await _storage.saveAccessToken(res['access_token'] as String);
+      _user = AuthUser(email: email, nickname: res['nickname'] as String?);
       _status = AuthStatus.authenticated;
     });
   }
 
-  /// 로그아웃. 토큰을 삭제하고 미인증 상태로 전환.
+  /// 로그아웃. 서버 FCM 토큰 정리 후 로컬 토큰 삭제.
   Future<void> logout() async {
-    // TODO(api): 필요 시 서버 세션 무효화(POST /auth/logout) 호출.
+    try {
+      await _backend.postJson('/api/auth/logout', {}, auth: true);
+    } catch (_) {}
     await _storage.clear();
     _user = null;
     _status = AuthStatus.unauthenticated;
     notifyListeners();
   }
 
-  /// 회원 탈퇴. 서버 탈퇴 후 로컬 토큰까지 정리.
+  /// 회원 탈퇴. 서버에서 계정 삭제 후 로컬 토큰 정리.
   Future<AuthResult> withdraw() async {
     return _run(() async {
-      // TODO(api): 김민재 님 Auth API(DELETE /auth/me) 연동.
-      await Future<void>.delayed(const Duration(milliseconds: 600));
+      await _backend.deleteJson('/api/auth/withdraw', auth: true);
       await _storage.clear();
       _user = null;
       _status = AuthStatus.unauthenticated;

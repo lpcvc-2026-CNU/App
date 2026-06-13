@@ -17,6 +17,9 @@ dependencies:
   firebase_core: ^3.0.0
   firebase_messaging: ^15.0.0
 
+  # [김규현] FastAPI 백엔드 통신 (건의/랜드마크/인증 API)
+  http: ^1.2.0
+
   # 온디바이스 추론 및 공통 유틸
   onnxruntime: ^1.4.1
   sqflite: ^2.3.0
