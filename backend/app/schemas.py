@@ -98,4 +98,40 @@ class NotificationResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        from_attributes = True
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. 검색 로그 관련 스키마 (Search Log Schemas)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class SearchLogCreate(BaseModel):
+    timestamp: str = Field(..., description="로그 기록 일시 (ISO 형식)")
+    query_type: str = Field(..., description="검색 쿼리 타입 (image, text)")
+    top1_id: Optional[str] = Field(None, description="탑 1 결과 랜드마크 ID")
+    decision: Optional[str] = Field(None, description="결정 유형")
+    reason_codes: Optional[str] = Field(None, description="결정 이유 코드")
+    latency_ms: Optional[int] = Field(None, description="소요 시간 (ms)")
+    model_version: Optional[str] = Field(None, description="모델 버전")
+    backend: Optional[str] = Field(None, description="백엔드 유형")
+    top3_scores: Optional[str] = Field(None, description="Top 3 결과 및 점수")
+    margin: Optional[float] = Field(None, description="Margin 점수 차이")
+    decision_status: Optional[str] = Field(None, description="최종 결정 상태")
+
+class SearchLogResponse(BaseModel):
+    id: int
+    timestamp: str
+    query_type: str
+    top1_id: Optional[str] = None
+    decision: Optional[str] = None
+    reason_codes: Optional[str] = None
+    latency_ms: Optional[int] = None
+    model_version: Optional[str] = None
+    backend: Optional[str] = None
+    top3_scores: Optional[str] = None
+    margin: Optional[float] = None
+    decision_status: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Text, Numeric, DateTime, Boolean, ForeignKey, func
+from sqlalchemy import Column, String, Text, Numeric, DateTime, Boolean, ForeignKey, func, Integer, Float
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -18,6 +18,7 @@ class Landmark(Base):
     description_ja = Column(Text, nullable=True, comment="일본어 개요")
     latitude = Column(Numeric(10, 8), nullable=False, comment="위도")
     longitude = Column(Numeric(11, 8), nullable=False, comment="경도")
+    parent_landmark_id = Column(String(100), ForeignKey("landmarks.id", ondelete="SET NULL"), nullable=True, comment="상위 랜드마크 식별자")
 
 class User(Base):
     __tablename__ = "users"
@@ -51,4 +52,22 @@ class Notification(Base):
     title = Column(String(255), nullable=False, comment="알림 제목")
     body = Column(Text, nullable=False, comment="알림 내용")
     is_read = Column(Boolean, default=False, nullable=False, comment="읽음 여부")
-    created_at = Column(DateTime, server_default=func.now(), comment="생성 일시")
+    created_at = Column(DateTime, server_default=func.now(), comment="생성 일시")
+
+
+class SearchLog(Base):
+    __tablename__ = "search_logs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, comment="로그 고유 식별자")
+    timestamp = Column(String(100), nullable=False, comment="로그 기록 일시 (ISO 형식)")
+    query_type = Column(String(50), nullable=False, comment="검색 쿼리 타입 (image, text)")
+    top1_id = Column(String(100), nullable=True, comment="탑 1 결과 랜드마크 ID")
+    decision = Column(String(50), nullable=True, comment="결정 유형")
+    reason_codes = Column(String(255), nullable=True, comment="결정 이유 코드")
+    latency_ms = Column(Integer, nullable=True, comment="소요 시간 (ms)")
+    model_version = Column(String(100), nullable=True, comment="모델 버전")
+    backend = Column(String(100), nullable=True, comment="백엔드 유형")
+    top3_scores = Column(Text, nullable=True, comment="Top 3 결과 및 점수")
+    margin = Column(Float, nullable=True, comment="Margin 점수 차이")
+    decision_status = Column(String(50), nullable=True, comment="최종 결정 상태")
+

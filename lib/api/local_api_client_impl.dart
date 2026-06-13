@@ -2,27 +2,29 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
 import 'local_api_client.dart';
+import 'backend_client.dart';
 import '../services/onnx_inference_service.dart';
 import '../services/image_quality_service.dart';
 import '../data/database_helper.dart';
 
 /// 온디바이스 시연 환경에 알맞게 보정 및 완화된 ConfidencePolicy 임계값 파라미터
 class _ConfidencePolicy {
-  static const double rejectThreshold            = 0.18; // 양자화 모델 스코어 저하 고려 완화
-  static const double weakRejectThreshold        = 0.25;
+  static const double rejectThreshold            = 0.22; // FP16 모델 정밀도 회복에 따른 보정
+  static const double weakRejectThreshold        = 0.28;
   static const double weakMargin                 = 0.08;
-  static const double matchThreshold             = 0.45; // 0.60 -> 0.45 완화하여 정확도 매칭 활성화
-  static const double matchFloor                 = 0.35; // 0.50 -> 0.35 하향 조정
-  static const double matchMargin                = 0.10; // 0.20 -> 0.10 완화
-  static const double textNoKeywordRejectThreshold = 0.28;
+  static const double matchThreshold             = 0.48; // FP16 매칭 활성화
+  static const double matchFloor                 = 0.38; 
+  static const double matchMargin                = 0.10; 
 }
 
 class LocalApiClientImpl implements LocalApiClient {
   final OnnxInferenceService _onnxService;
   final ImageQualityService _qualityService;
   final DatabaseHelper _dbHelper;
+  final BackendClient? _backendClient;
 
-  LocalApiClientImpl(this._onnxService, this._qualityService, this._dbHelper);
+  LocalApiClientImpl(this._onnxService, this._qualityService, this._dbHelper, [this._backendClient]);
+
 
   // ── 다국어 지원 로케일 정보 ──────────────────────────────────────────────────
   String _languageCode = 'ko'; // 기본값은 한국어
@@ -35,6 +37,10 @@ class LocalApiClientImpl implements LocalApiClient {
     _languageCode = code;
   }
 
+  @override
+  String? get modelSpecWarning => _onnxService.modelSpecWarning;
+
+
   // ── 프로토타입 캐시 ─────────────────────────────────────────────────────────
   List<String>? _landmarkIds;
   List<List<double>>? _protoMatrix; // (N, 512) – 각 행이 L2-정규화된 프로토타입
@@ -42,7 +48,7 @@ class LocalApiClientImpl implements LocalApiClient {
   Future<void> _loadPrototypes() async {
     if (_protoMatrix != null) return;
     final String jsonString =
-        await rootBundle.loadString('assets/mobile_artifacts_int8/prototype_index.json');
+        await rootBundle.loadString('assets/mobile_artifacts_fp16/prototype_index.json');
     final Map<String, dynamic> jsonMap = json.decode(jsonString);
     final items = jsonMap['items'] as List<dynamic>;
 
@@ -51,7 +57,8 @@ class LocalApiClientImpl implements LocalApiClient {
 
     for (final item in items) {
       final id = item['landmark_id'] as String;
-      final rawProto = (item['prototype'] as List<dynamic>)
+      final rawList = (item['embedding'] ?? item['prototype']) as List<dynamic>;
+      final rawProto = rawList
           .map((e) => (e as num).toDouble())
           .toList();
       ids.add(id);
@@ -114,11 +121,16 @@ class LocalApiClientImpl implements LocalApiClient {
     final scores = <Map<String, dynamic>>[];
     for (int i = 0; i < ids.length; i++) {
       final score = _dotProduct(embedding, matrix[i]);
-      scores.add({'landmark_id': ids[i], 'score': score, 'percentage': _percentage(score)});
+      scores.add({
+        'landmark_id': ids[i],
+        'raw_score': score,
+        'display_score': _percentage(score),
+        'score_type': 'cosine_similarity',
+      });
     }
 
     // 내림차순 정렬 후 Top-K
-    scores.sort((a, b) => (b['score'] as double).compareTo(a['score'] as double));
+    scores.sort((a, b) => (b['raw_score'] as double).compareTo(a['raw_score'] as double));
     return scores.take(topK).toList();
   }
 
@@ -132,9 +144,9 @@ class LocalApiClientImpl implements LocalApiClient {
       return {'decision': 'out_of_scope', 'reason_codes': ['no_candidate']};
     }
 
-    final double top1Score = topResults[0]['score'] as double;
+    final double top1Score = topResults[0]['raw_score'] as double;
     final double top2Score =
-        topResults.length > 1 ? topResults[1]['score'] as double : 0.0;
+        topResults.length > 1 ? topResults[1]['raw_score'] as double : 0.0;
     final double margin = top1Score - top2Score;
     final reasons = <String>[];
 
@@ -196,6 +208,24 @@ class LocalApiClientImpl implements LocalApiClient {
       row['description'] = row['description_ko'] ?? row['description_en'] ?? '';
     }
 
+    // parent_landmark_id를 활용한 부모 랜드마크 한국어/영어/기타 명칭 조회 추가 (P1)
+    final parentId = row['parent_landmark_id'] as String?;
+    if (parentId != null && parentId.isNotEmpty) {
+      final parentRes = await db.query('landmarks', where: 'id = ?', whereArgs: [parentId]);
+      if (parentRes.isNotEmpty) {
+        final parentRow = parentRes.first;
+        if (_languageCode == 'en') {
+          row['parent_name'] = parentRow['name_en'] ?? parentRow['name_ko'] ?? '';
+        } else if (_languageCode == 'zh') {
+          row['parent_name'] = parentRow['name_zh'] ?? parentRow['name_en'] ?? parentRow['name_ko'] ?? '';
+        } else if (_languageCode == 'ja') {
+          row['parent_name'] = parentRow['name_ja'] ?? parentRow['name_en'] ?? parentRow['name_ko'] ?? '';
+        } else {
+          row['parent_name'] = parentRow['name_ko'] ?? parentRow['name_en'] ?? '';
+        }
+      }
+    }
+
     return row;
   }
 
@@ -207,7 +237,18 @@ class LocalApiClientImpl implements LocalApiClient {
     } catch (e) {
       print('로그 기록 실패 (무시): $e');
     }
+
+    if (_backendClient != null) {
+      // 서버 로그 기록은 네트워크 통신이 필요하므로, 사용자 UI 흐름에 지장을 주지 않도록
+      // 비동기 백그라운드로 호출하고 예외 발생 시 print 로그만 남깁니다.
+      _backendClient!.postJson('/api/search/logs', logData).then((_) {
+        print('서버 검색 로그 전송 성공');
+      }).catchError((err) {
+        print('서버 검색 로그 전송 실패 (무시): $err');
+      });
+    }
   }
+
 
   @override
   Future<Map<String, dynamic>> search(Uint8List imageBytes, {String? textQuery}) async {
@@ -229,8 +270,10 @@ class LocalApiClientImpl implements LocalApiClient {
       final top3 = res
           .map((r) => {
                 'landmark_id': r['landmark_id'],
-                'percentage': 100,
-                'score': 1.0,
+                'score_type': 'keyword_match',
+                'raw_score': null,
+                'keyword_score': 0.95,
+                'semantic_score': null,
               })
           .toList();
 
@@ -244,6 +287,11 @@ class LocalApiClientImpl implements LocalApiClient {
         'decision': decision,
         'reason_codes': 'keyword_match',
         'latency_ms': stopwatch.elapsedMilliseconds,
+        'model_version': 'MobileCLIP2-S3-FP16',
+        'backend': 'SQLite-LIKE',
+        'top3_scores': top3.map((r) => '${r["landmark_id"]}=0.95').join(', '),
+        'margin': 0.0,
+        'decision_status': decision,
       });
 
       return {
@@ -251,7 +299,6 @@ class LocalApiClientImpl implements LocalApiClient {
         'decision': decision,
         'reason_codes': ['keyword_match'],
         'latency_ms': stopwatch.elapsedMilliseconds,
-        'image_bytes': Uint8List(0),
       };
     }
 
@@ -275,13 +322,18 @@ class LocalApiClientImpl implements LocalApiClient {
 
     // 3. 유사도 검색 및 Top-3 랭킹
     final top3 = await getRetrievalResults(embedding);
-    print('[Debug] top3 scores: ${top3.map((r) => '${r["landmark_id"]}=${(r["score"] as double).toStringAsFixed(4)}').join(', ')}');
+    print('[Debug] top3 scores: ${top3.map((r) => '${r["landmark_id"]}=${(r["raw_score"] as double).toStringAsFixed(4)}').join(', ')}');
 
     // 4. 신뢰도 판단 (Confidence Policy)
     final confidence = await checkSearchConfidence(top3, 'image');
     print('[Debug] decision: ${confidence["decision"]}, reasons: ${confidence["reason_codes"]}');
 
     stopwatch.stop();
+
+    final top1RawScore = top3.isNotEmpty ? top3[0]['raw_score'] as double : 0.0;
+    final top2RawScore = top3.length > 1 ? top3[1]['raw_score'] as double : 0.0;
+    final margin = top1RawScore - top2RawScore;
+    final top3ScoresStr = top3.map((r) => '${r["landmark_id"]}=${(r["raw_score"] as double).toStringAsFixed(4)}').join(', ');
 
     // 5. 검색 로그 기록
     await logSearch({
@@ -291,6 +343,11 @@ class LocalApiClientImpl implements LocalApiClient {
       'decision': confidence['decision'],
       'reason_codes': (confidence['reason_codes'] as List).join(','),
       'latency_ms': stopwatch.elapsedMilliseconds,
+      'model_version': 'MobileCLIP2-S3-FP16',
+      'backend': 'ONNXRuntime-CPU',
+      'top3_scores': top3ScoresStr,
+      'margin': margin,
+      'decision_status': confidence['decision'],
     });
 
     return {

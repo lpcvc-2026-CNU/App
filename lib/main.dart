@@ -33,18 +33,27 @@ void main() async {
   final onnxService = OnnxInferenceService();
   final qualityService = ImageQualityService();
   final dbHelper = DatabaseHelper.instance;
-  final apiClient = LocalApiClientImpl(onnxService, qualityService, dbHelper);
 
   // [금동엽] 인증: 보안 저장소 기반 토큰 보관 + 전역 컨트롤러.
   final tokenStorage = SecureTokenStorage();
   // BackendClient를 AuthController와 공유해 로그인/건의 API 모두에서 재사용.
   final backendClient = BackendClient(tokenStorage: tokenStorage);
+
+  final apiClient = LocalApiClientImpl(onnxService, qualityService, dbHelper, backendClient);
+
+  // 앱 기동 시 백그라운드로 온디바이스 모델 선제적 로드 및 정합성 검증 실행
+  onnxService.initializeOnnxModel().catchError((e) {
+    print('앱 시작 시 모델 초기화 실패: $e');
+  });
+
+
   final authController = AuthController(
     storage: tokenStorage,
     backendClient: backendClient,
     // 로그인/가입 시 기기 FCM 토큰을 함께 보내 알림 수신을 활성화.
     pushTokenProvider: () => PushNotificationService.instance.token,
   );
+
   // 저장된 토큰을 확인해 로그인 상태를 복원.
   await authController.bootstrap();
 
