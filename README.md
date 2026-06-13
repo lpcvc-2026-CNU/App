@@ -1,2 +1,69 @@
-"#### 2. 수정 및 리팩토링 사항 (Modified)\n- **SQLite 로컬 DB 스키마 및 마이그레이션 (`lib/data/database_helper.dart`)**: 테이블 정의에 다국어 이름/설명 컬럼들을 추가하고, DB 버전을 `3`으로 올려 구버전 사용자의 폰에서도 DROP 후 자동 데이터 리셋 및 마스터 데이터 재적재가 이루어지도록 고도화했습니다.\n- **로컬 API 클라이언트 동적 로케일 바인딩 (`lib/api/local_api_client_impl.dart`)**: `getLandmarkDetails` API 내에서 현재 상태의 `languageCode`에 알맞은 언어 정보(`name`, `description`)를 바인딩하여 리턴하는 dynamic dynamic-translation 로직을 완성했습니다.\n- **UI 화면 하드코딩 일괄 해제**:\n  - `result_screen.dart`, `detail_screen.dart`, `text_search_screen.dart` 내에서 특정 다국어 키(`name_ko` 등)를 수동 분기 처리하던 UI 하드코딩을 제거하고, API 레벨에서 가공된 `data['name']` 및 `data['description']` 공통 다국어 프로퍼티를 직접 렌더링하도록 일괄 구조를 개선했습니다.\n- **위젯 테스트 문법 오류 해결 (`test/widget_test.dart`)**: 기본 카운터 템플릿과의 문법 크래시 에러를 제거하고 clean placeholder 테스트로 갱신하여 `flutter analyze` 100% 무오류 통과(0 Errors)를 실현했습니다.\n\n---\n\n## 20260608 Update\n\n### 🚀 FastAPI 기반 백엔드 코어 API 및 JWT 회원 인증 시스템 구현\n\n#### 1. 추가 사항 (Added)\n- **FastAPI 백엔드 서비스 (`backend/`)**: Python 환경의 FastAPI, Uvicorn, SQLAlchemy ORM 기반 백엔드 코어를 구축했습니다.\n- **JWT 회원 인증 시스템 (`backend/app/routers/auth.py`)**:\n  - 회원가입 (`POST /api/auth/register`): 비밀번호 최소 8자 이상 강제 검증 규칙 구현 (특수문자 선택 허용).\n  - 로그인 (`POST /api/auth/login`): Access Token 발급 및 **1계정 1기기 정책**에 따른 중복 기기 푸시 토큰 자동 무효화(`NULL` 처리) 구현.\n  - 로그아웃 (`POS
-<truncated 2260 bytes>
+# Seoul Landmark Assistant
+
+서울 랜드마크 이미지 인식 및 상세 정보 조회를 제공하는 다국어 하이브리드 어플리케이션 프로젝트입니다. ONNX Runtime 기반의 디바이스 내 추론 기능 및 회원 가입/인증, 실시간 푸시 알림 인프라를 지원합니다.
+
+---
+
+## 🚀 2026.06.10 업데이트: FCM 푸시 알림 인프라 구축 및 연동
+
+### 1. 백엔드 (FastAPI) 변경 사항
+- **FCM 푸시 발송 인프라 통합**: `firebase-admin` 라이브러리를 추가하고, `firebase-service-account.json` 자격 증명서 파일이 백엔드 폴더 내에 존재할 경우 자동으로 FCM Admin SDK를 초기화하도록 설계했습니다.
+- **Mock/Sandbox 모드 지원**: 로컬 개발 환경 및 Firebase 콘솔 설정이 완료되기 전에도 백엔드가 정상 기동하도록 안전 예외 처리(Try-Catch) 및 Mock 푸시 로그 출력 모드를 도입했습니다.
+- **푸시 발송 테스트용 API 구현**: `POST /api/notifications/send` 엔드포인트를 구현하여 수신자의 `push_token` 혹은 가입 이메일을 바탕으로 실시간 푸시 알림을 즉시 발송하고 결과를 검증할 수 있습니다.
+- **1기기 1계정 정책 강화**: 회원가입(`POST /api/auth/register`) 및 로그인(`POST /api/auth/login`) 요청 시 전달받은 `push_token`을 고유 기기 식별자로 삼아, 타 유저가 점유하고 있던 토큰을 자동으로 무효화(`None` 처리)합니다.
+- **백엔드 파일 복구 및 핫픽스**: 기존에 깨져있던 Python 백엔드 코어 소스코드들(`models.py`, `schemas.py`, `security.py`, `auth.py`, `migrate_landmarks.py`)을 복구했으며, 추가적으로 `landmarks.py` 모듈이 문자열 형태로 인코딩되어 uvicorn 구동 시 발생하던 `AttributeError` 버그를 핫픽스(실제 코드로 복구) 완료했습니다.
+
+### 2. 클라이언트 (Flutter App) 변경 사항
+- **Firebase 패키지 의존성 추가**: `firebase_core` 및 `firebase_messaging` 모듈을 연동했습니다.
+- **푸시 서비스 추상화 (`PushNotificationService`)**: 포그라운드/백그라운드 메시지 수신, 토큰 갱신 리스너 등록, iOS용 APNS 토큰 대기 등의 공통 인터페이스를 제공하는 싱글톤 서비스를 추가했습니다. 백엔드와 마찬가지로 Firebase 설정 파일 누락 시 자동으로 가상 디버그 토큰을 발급하는 Sandbox 모드를 탑재했습니다.
+- **포그라운드 알림 사용자 인터페이싱**: 앱이 활성화된 포그라운드 상태에서 백엔드나 FCM으로부터 메시지를 받았을 때, 화면 하단에 알림 메시지를 담은 `SnackBar`가 즉시 표시되도록 `home_screen.dart` 초기화 로직을 업데이트했습니다.
+- **호환성 보정**: 현 타겟 SDK 환경에서 정의되지 않은 `Color.withValues` 메서드를 안전하고 하위 호환성을 가진 `Color.withOpacity` 메서드로 일괄 리팩토링하여 빌드 에러를 방지했습니다.
+- **Gradle 빌드 및 SDK/NDK 호환성 확보**:
+  - 프로젝트 수준 `settings.gradle.kts`와 앱 수준 `build.gradle.kts`에 `com.google.gms.google-services` 플러그인을 정상 적용하여 Firebase 연동을 완료했습니다.
+  - 최신 Firebase 라이브러리 연동 규격에 맞추어 `compileSdk` 버전을 `35`로, `ndkVersion`을 `"27.0.12077973"`으로 최적화했습니다.
+  - 에뮬레이터 디버깅 지원을 위해 `abiFilters`에 `"x86_64"`를 추가하고 중복 항목을 정리했습니다.
+
+---
+
+## 🚀 2026.06.12 업데이트: 건의 상태 변경 알림 트리거 및 앱 내 알림함 API 구축
+
+### 1. 백엔드 (FastAPI) 변경 사항
+- **실시간 알림 발송 로직 연동**: 관리자 권한으로 건의 상태가 변경(`approved` 또는 `rejected`)되는 순간, 해당 유저의 디바이스 토큰(`push_token`)을 조회하여 실시간 FCM 푸시 알림을 즉시 발송합니다.
+- **알림 내역 데이터베이스 테이블 (`Notification`)**: 알림 이력을 기록 및 저장할 수 있도록 `Notification` 테이블을 설계하고 추가했습니다. (유저 탈퇴 시 연동된 알림 데이터는 cascade delete 처리)
+- **앱 내 알림함 API**:
+  - `GET /api/notifications`: 로그인한 사용자의 모든 알림 목록을 최신순으로 조회합니다.
+  - `PATCH /api/notifications/{notification_id}/read`: 본인이 수신한 특정 알림을 읽음(`is_read = true`) 처리합니다.
+- **통합 시나리오 검증 성공**: FastAPI `TestClient` 기반 통합 시나리오 테스트(로그인 -> 건의 제출 -> 관리자 승인 -> 알림 DB 생성 확인 -> 알림 조회 API 및 읽음 처리 상태 갱신 API 호출)를 전 단계 모두 성공적으로 완료했습니다.
+
+---
+
+## 🛠️ 팀원 연동 및 로컬 테스트 가이드
+
+### 1. Firebase 콘솔 설정 (실제 FCM 수신용)
+FCM을 실제 모바일 기기 혹은 에뮬레이터에서 수신하기 위해 콘솔 설정을 진행해야 합니다:
+1. **[Firebase 콘솔](https://console.firebase.google.com/)**에 접속하여 새 프로젝트를 생성합니다.
+2. **Android 앱 추가**: 패키지명 `com.example.landmark_demo_app` 등으로 등록 후 `google-services.json` 파일을 다운로드하여 `android/app/` 경로에 배치합니다.
+3. **iOS 앱 추가**: 번들 ID 등록 후 `GoogleService-Info.plist` 파일을 다운로드하여 `ios/Runner/` 경로에 배치합니다.
+4. **서비스 계정 키 발급**: `프로젝트 설정` -> `서비스 계정` 탭에서 **새 비공개 키 생성** 버튼을 눌러 JSON 파일을 다운로드합니다. 이 파일의 이름을 `firebase-service-account.json`으로 변경한 뒤 `backend/` 폴더 바로 아래에 넣어주세요.
+
+### 2. 백엔드 로컬 실행 방법
+```bash
+# 의존성 패키지 설치
+cd backend
+pip install -r requirements.txt
+
+# 데이터 마스터 마이그레이션 (SQLite/MySQL에 랜드마크 적재)
+python migrate_landmarks.py
+
+# uvicorn 서버 구동 (기본 포트 8000)
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### 3. 클라이언트 로컬 실행 방법
+```bash
+# Flutter 패키지 가져오기
+flutter pub get
+
+# 앱 실행 (FCM 토큰은 앱 실행 시 터미널 콘솔창 로그에 [FCM 디버그] 태그로 출력됩니다)
+flutter run
+```

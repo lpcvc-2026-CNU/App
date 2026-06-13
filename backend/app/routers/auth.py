@@ -106,6 +106,7 @@ def get_me(current_user: User = Depends(get_current_user)):
         "id": current_user.id,
         "email": current_user.email,
         "nickname": current_user.nickname,
+        "is_admin": current_user.is_admin,
         "push_token": current_user.push_token,
         "created_at": current_user.created_at
     }

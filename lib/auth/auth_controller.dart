@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../api/backend_client.dart';
@@ -18,10 +20,13 @@ enum AuthStatus {
 /// 로그인한 사용자의 최소 정보(클라이언트 보관용).
 @immutable
 class AuthUser {
-  const AuthUser({required this.email, this.nickname});
+  const AuthUser({required this.email, this.nickname, this.isAdmin = false});
 
   final String email;
   final String? nickname;
+
+  /// 관리자(개발자) 여부. admin 전용 메뉴(건의 관리) 노출 분기에 사용.
+  final bool isAdmin;
 }
 
 /// 앱 전역의 인증 상태를 관리하는 컨트롤러.
@@ -36,11 +41,17 @@ class AuthController extends ChangeNotifier {
   AuthController({
     required TokenStorage storage,
     required BackendClient backendClient,
+    String? Function()? pushTokenProvider,
   })  : _storage = storage,
-        _backend = backendClient;
+        _backend = backendClient,
+        _pushTokenProvider = pushTokenProvider;
 
   final TokenStorage _storage;
   final BackendClient _backend;
+
+  /// 현재 기기의 FCM 푸시 토큰을 읽어오는 함수(없으면 null).
+  /// PushNotificationService에 직접 의존하지 않도록 주입받는다.
+  final String? Function()? _pushTokenProvider;
 
   AuthStatus _status = AuthStatus.unknown;
   AuthStatus get status => _status;
@@ -67,12 +78,10 @@ class AuthController extends ChangeNotifier {
       return;
     }
     try {
-      final me = await _backend.getJson('/api/auth/me', auth: true);
-      _user = AuthUser(
-        email: (me['email'] ?? '') as String,
-        nickname: me['nickname'] as String?,
-      );
+      await _loadMe();
       _status = AuthStatus.authenticated;
+      // mock 토큰은 앱 실행마다 바뀌고 실 FCM도 재설치 시 바뀌므로 서버와 동기화.
+      unawaited(syncPushToken());
     } on BackendException catch (e) {
       if (e.isUnauthorized) {
         // 무효 토큰(만료/위조/구 mock) → 정리 후 로그인 화면으로.
@@ -86,18 +95,58 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 로그인.
+  /// `/api/auth/me` 응답으로 [_user] 를 구성하는 공통 헬퍼.
+  ///
+  /// 로그인 응답(TokenResponse)에는 is_admin이 없어 항상 /me 를 기준으로 한다.
+  Future<void> _loadMe() async {
+    final me = await _backend.getJson('/api/auth/me', auth: true);
+    _user = AuthUser(
+      email: (me['email'] ?? '') as String,
+      nickname: me['nickname'] as String?,
+      isAdmin: (me['is_admin'] ?? false) == true,
+    );
+  }
+
+  /// 현재 기기의 FCM 토큰을 서버(User.push_token)에 반영한다.
+  ///
+  /// 미인증 상태면 아무것도 하지 않으며, 실패해도 앱 흐름에 영향이 없도록
+  /// 조용히 무시한다. 백엔드 엔드포인트가 query parameter 를 받는 점에 주의.
+  Future<void> syncPushToken([String? token]) async {
+    if (!isAuthenticated) return;
+    final t = token ?? _pushTokenProvider?.call();
+    if (t == null || t.isEmpty) return;
+    try {
+      await _backend.patchJson(
+        '/api/auth/fcm-token?push_token=${Uri.encodeQueryComponent(t)}',
+        {},
+        auth: true,
+      );
+    } catch (_) {}
+  }
+
+  /// 로그인. 기기 푸시 토큰이 있으면 함께 보내 알림 수신을 활성화한다.
   Future<AuthResult> login({
     required String email,
     required String password,
   }) async {
     return _run(() async {
+      final pushToken = _pushTokenProvider?.call();
       final res = await _backend.postJson(
         '/api/auth/login',
-        {'email': email, 'password': password},
+        {
+          'email': email,
+          'password': password,
+          if (pushToken != null && pushToken.isNotEmpty)
+            'push_token': pushToken,
+        },
       );
       await _storage.saveAccessToken(res['access_token'] as String);
-      _user = AuthUser(email: email, nickname: res['nickname'] as String?);
+      try {
+        await _loadMe();
+      } on BackendException {
+        // /me 일시 실패 시 로그인 응답 정보로 최소 구성.
+        _user = AuthUser(email: email, nickname: res['nickname'] as String?);
+      }
       _status = AuthStatus.authenticated;
     });
   }
@@ -112,17 +161,33 @@ class AuthController extends ChangeNotifier {
       // nickname 미입력 시 이메일 로컬파트를 기본값으로 사용(백엔드 min_length=1 충족).
       final effectiveNickname =
           (nickname == null || nickname.isEmpty) ? email.split('@').first : nickname;
+      final pushToken = _pushTokenProvider?.call();
       await _backend.postJson(
         '/api/auth/register',
-        {'email': email, 'password': password, 'nickname': effectiveNickname},
+        {
+          'email': email,
+          'password': password,
+          'nickname': effectiveNickname,
+          if (pushToken != null && pushToken.isNotEmpty)
+            'push_token': pushToken,
+        },
       );
       // 가입 성공 후 자동 로그인.
       final res = await _backend.postJson(
         '/api/auth/login',
-        {'email': email, 'password': password},
+        {
+          'email': email,
+          'password': password,
+          if (pushToken != null && pushToken.isNotEmpty)
+            'push_token': pushToken,
+        },
       );
       await _storage.saveAccessToken(res['access_token'] as String);
-      _user = AuthUser(email: email, nickname: res['nickname'] as String?);
+      try {
+        await _loadMe();
+      } on BackendException {
+        _user = AuthUser(email: email, nickname: res['nickname'] as String?);
+      }
       _status = AuthStatus.authenticated;
     });
   }
