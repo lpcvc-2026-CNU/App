@@ -37,7 +37,7 @@ class Suggestion(Base):
     user_id = Column(String(100), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True, comment="제출 사용자 ID")
     landmark_name = Column(String(255), nullable=False, comment="건의할 랜드마크 이름")
     description = Column(Text, nullable=False, comment="랜드마크 상세 설명")
-    status = Column(String(50), nullable=False, default="pending", index=True, comment="건의 처리 상태")
+    status = Column(String(50), nullable=False, default="pending", index=True, comment="건의 처리 상태 (pending, approved, rejected, completed)")
     rejection_reason = Column(String(255), nullable=True, comment="반려 사유 (반려 시에만 기록)")
     created_at = Column(DateTime, server_default=func.now(), comment="제출 일시")
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment="수정 일시")

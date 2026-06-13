@@ -59,11 +59,13 @@ class SuggestionCreate(BaseModel):
     description: str = Field(..., min_length=1, description="랜드마크에 대한 간단한 설명")
 
 class SuggestionStatusUpdate(BaseModel):
-    status: str = Field(..., description="변경할 상태 ('approved' 또는 'rejected')")
+    status: str = Field(..., description="변경할 상태 ('approved', 'rejected', 'completed')")
     rejection_reason: Optional[str] = Field(None, description="반려 사유 (rejected일 경우 필수)")
 
     @model_validator(mode="after")
     def check_rejection_reason(self) -> "SuggestionStatusUpdate":
+        if self.status not in ["approved", "rejected", "completed"]:
+            raise ValueError("status는 'approved', 'rejected', 'completed' 중 하나여야 합니다.")
         if self.status == "rejected":
             if not self.rejection_reason or not self.rejection_reason.strip():
                 raise ValueError("반려 상태로 변경 시 반려 사유(rejection_reason)는 필수이며 비어있을 수 없습니다.")
