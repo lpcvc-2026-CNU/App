@@ -17,6 +17,11 @@ REQUIRED_BUNDLE_FILES = (
     "labels_master.json",
     "config.yaml",
     "confidence_policy.json",
+    "tokenizer_bundle.json",
+    "text_index.json",
+    "text_search_policy.json",
+    "text_query_regression_set.json",
+    "text_search_eval_report.json",
 )
 
 
@@ -70,8 +75,23 @@ def main():
     manifest_path = ARTIFACT_DIR / "manifest.json"
     classes_path = ARTIFACT_DIR / "classes.json"
     prototype_path = ARTIFACT_DIR / "prototype_index.json"
+    tokenizer_bundle_path = ARTIFACT_DIR / "tokenizer_bundle.json"
+    text_index_path = ARTIFACT_DIR / "text_index.json"
+    text_policy_path = ARTIFACT_DIR / "text_search_policy.json"
+    text_regression_path = ARTIFACT_DIR / "text_query_regression_set.json"
+    text_eval_path = ARTIFACT_DIR / "text_search_eval_report.json"
 
-    for path in (manifest_path, classes_path, prototype_path, INFO_PATH):
+    for path in (
+        manifest_path,
+        classes_path,
+        prototype_path,
+        tokenizer_bundle_path,
+        text_index_path,
+        text_policy_path,
+        text_regression_path,
+        text_eval_path,
+        INFO_PATH,
+    ):
         if not path.exists():
             fail(errors, f"required file not found: {path.relative_to(ROOT)}")
 
@@ -82,6 +102,11 @@ def main():
     classes = class_ids_from_classes_json(load_json(classes_path))
     prototype = load_json(prototype_path)
     info = load_json(INFO_PATH)
+    tokenizer_bundle = load_json(tokenizer_bundle_path)
+    text_index = load_json(text_index_path)
+    text_policy = load_json(text_policy_path)
+    text_regression = load_json(text_regression_path)
+    text_eval = load_json(text_eval_path)
 
     ok("manifest/classes/prototype/landmark_info loaded")
 
@@ -161,6 +186,89 @@ def main():
 
     if missing_without_fallback:
         warn(warnings, f"missing direct hero images without parent hero fallback: {missing_without_fallback}")
+
+    if tokenizer_bundle.get("context_length") == 77:
+        ok("tokenizer context_length is 77")
+    else:
+        fail(errors, f"unexpected tokenizer context_length: {tokenizer_bundle.get('context_length')}")
+
+    fixtures = tokenizer_bundle.get("fixtures", [])
+    if fixtures and all(isinstance(item.get("tokens"), list) for item in fixtures):
+        ok(f"tokenizer fixtures exist: {len(fixtures)}")
+    else:
+        fail(errors, "tokenizer fixtures are missing or malformed")
+
+    text_items = text_index.get("items", []) if isinstance(text_index, dict) else []
+    if text_items:
+        ok(f"text index items exist: {len(text_items)}")
+    else:
+        fail(errors, "text_index.json has no items")
+
+    bad_text_ids = sorted(
+        {
+            item.get("landmark_id")
+            for item in text_items
+            if item.get("landmark_id") not in info_ids
+        }
+    )
+    if bad_text_ids:
+        fail(errors, f"text index landmark_id missing in landmark_info.json: {bad_text_ids}")
+    else:
+        ok("all text_index landmark_ids exist in landmark_info.json")
+
+    bad_text_dims = [
+        item.get("text_id")
+        for item in text_items
+        if len(item.get("embedding", [])) != embedding_dim
+    ]
+    if bad_text_dims:
+        fail(errors, f"text index embedding dim mismatch: {bad_text_dims[:10]}")
+    else:
+        ok(f"all text index embeddings have dimension {embedding_dim}")
+
+    for key in (
+        "semantic_weight",
+        "keyword_weight",
+        "matched_threshold",
+        "ambiguous_margin",
+        "out_of_scope_threshold",
+        "no_keyword_oos_margin",
+        "no_keyword_match_threshold",
+    ):
+        if isinstance(text_policy.get(key), (int, float)):
+            ok(f"text search policy has numeric {key}")
+        else:
+            fail(errors, f"text search policy missing numeric {key}")
+
+    queries = text_regression.get("items", [])
+    if queries:
+        ok(f"text regression queries exist: {len(queries)}")
+    else:
+        fail(errors, "text_query_regression_set.json has no queries")
+
+    bad_expected_ids = sorted(
+        {
+            query.get("expected_landmark_id")
+            for query in queries
+            if query.get("expected_landmark_id") is not None
+            and query.get("expected_landmark_id") not in info_ids
+        }
+    )
+    if bad_expected_ids:
+        fail(errors, f"text regression expected ids missing in landmark_info.json: {bad_expected_ids}")
+    else:
+        ok("text regression expected ids resolve to landmark_info.json")
+
+    for key in (
+        "query_count",
+        "top1_accuracy",
+        "top3_recall",
+        "out_of_scope_accuracy",
+    ):
+        if key in text_eval:
+            ok(f"text eval report has {key}: {text_eval[key]}")
+        else:
+            fail(errors, f"text eval report missing {key}")
 
     print("")
     print(f"Contract check complete: errors={len(errors)}, warnings={len(warnings)}")

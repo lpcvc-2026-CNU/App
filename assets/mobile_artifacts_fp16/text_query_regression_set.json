@@ -1,0 +1,1663 @@
+{
+  "version": "text-query-regression-set-v1",
+  "source": "assets\\landmark_info.json",
+  "count": 184,
+  "items": [
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_name_ko",
+      "query": "경복궁 근정문",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_name_en",
+      "query": "Gyeongbokgung Geunjeongmun",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_description_ko",
+      "query": "종로구에 위치한 조선 시대 경복궁의 정전인 근정전으로 들어가는 정문입니다.",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_description_en",
+      "query": "The main gate leading to Geunjeongjeon, the throne hall of Gyeongbokgung Palace in Jongno-gu.",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_alias_000",
+      "query": "경복궁",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_alias_001",
+      "query": "근정문",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_alias_002",
+      "query": "광화문 뒤",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_alias_003",
+      "query": "경복궁 정문",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "myeongdong_cathedral_name_ko",
+      "query": "명동성당",
+      "expected_landmark_id": "myeongdong_cathedral",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "myeongdong_cathedral_name_en",
+      "query": "Myeongdong Cathedral",
+      "expected_landmark_id": "myeongdong_cathedral",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "myeongdong_cathedral_description_ko",
+      "query": "중구 명동에 위치한 한국 천주교 서울대교구의 주교좌 성당이자 대표적인 고딕 양식 건축물입니다.",
+      "expected_landmark_id": "myeongdong_cathedral",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "myeongdong_cathedral_description_en",
+      "query": "The cathedral church of the Roman Catholic Archdiocese of Seoul, located in Myeong-dong, Jung-gu.",
+      "expected_landmark_id": "myeongdong_cathedral",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "myeongdong_cathedral_alias_000",
+      "query": "명동성당",
+      "expected_landmark_id": "myeongdong_cathedral",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "myeongdong_cathedral_alias_001",
+      "query": "명동 대성당",
+      "expected_landmark_id": "myeongdong_cathedral",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "myeongdong_cathedral_alias_002",
+      "query": "명동 천주교회",
+      "expected_landmark_id": "myeongdong_cathedral",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_name_ko",
+      "query": "창경궁",
+      "expected_landmark_id": "changgyeonggung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_name_en",
+      "query": "Changgyeonggung",
+      "expected_landmark_id": "changgyeonggung",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_description_ko",
+      "query": "종로구에 위치한 조선 시대의 궁궐로, 창덕궁과 인접해 있어 동궐로도 불렸던 유서 깊은 장소입니다.",
+      "expected_landmark_id": "changgyeonggung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_description_en",
+      "query": "One of the Five Grand Palaces of the Joseon Dynasty, located in Jongno-gu, historically associated with Changdeokgung.",
+      "expected_landmark_id": "changgyeonggung",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_alias_000",
+      "query": "창경궁",
+      "expected_landmark_id": "changgyeonggung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_alias_001",
+      "query": "동궐",
+      "expected_landmark_id": "changgyeonggung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_alias_002",
+      "query": "혜화 궁궐",
+      "expected_landmark_id": "changgyeonggung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "bohyunsanshingak_name_ko",
+      "query": "보현산 신각",
+      "expected_landmark_id": "bohyunsanshingak",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "bohyunsanshingak_name_en",
+      "query": "Bohyunsan Shingak",
+      "expected_landmark_id": "bohyunsanshingak",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "bohyunsanshingak_description_ko",
+      "query": "산신을 모시는 전통 신각으로, 보현산의 정기와 불교 전통 문화가 융합된 문화유산입니다.",
+      "expected_landmark_id": "bohyunsanshingak",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "bohyunsanshingak_description_en",
+      "query": "A traditional shrine dedicated to the Mountain God (Sanshin), blending Buddhist and local folklore on Mt. Bohyunsan.",
+      "expected_landmark_id": "bohyunsanshingak",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "bohyunsanshingak_alias_000",
+      "query": "보현산신각",
+      "expected_landmark_id": "bohyunsanshingak",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "bohyunsanshingak_alias_001",
+      "query": "신각",
+      "expected_landmark_id": "bohyunsanshingak",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "bohyunsanshingak_alias_002",
+      "query": "산신각",
+      "expected_landmark_id": "bohyunsanshingak",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheonggyecheon_name_ko",
+      "query": "청계천",
+      "expected_landmark_id": "cheonggyecheon",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheonggyecheon_name_en",
+      "query": "Cheonggyecheon",
+      "expected_landmark_id": "cheonggyecheon",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheonggyecheon_description_ko",
+      "query": "서울 도심을 관통하는 자연 하천으로, 산책로와 다채로운 문화 축제가 열리는 시민들의 휴식 공간입니다.",
+      "expected_landmark_id": "cheonggyecheon",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheonggyecheon_description_en",
+      "query": "A modern public recreation space and stream flowing through downtown Seoul, popular for walking and seasonal festivals.",
+      "expected_landmark_id": "cheonggyecheon",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheonggyecheon_alias_000",
+      "query": "청계천",
+      "expected_landmark_id": "cheonggyecheon",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheonggyecheon_alias_001",
+      "query": "광화문 청계천",
+      "expected_landmark_id": "cheonggyecheon",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheonggyecheon_alias_002",
+      "query": "청계광장",
+      "expected_landmark_id": "cheonggyecheon",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheongwadae_name_ko",
+      "query": "청와대",
+      "expected_landmark_id": "cheongwadae",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheongwadae_name_en",
+      "query": "Cheongwadae",
+      "expected_landmark_id": "cheongwadae",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheongwadae_description_ko",
+      "query": "종로구 북악산 아래 위치한 역대 대통령들의 집무실이자 관저였던 곳으로, 현재는 일반 시민에게 개방된 역사 공간입니다.",
+      "expected_landmark_id": "cheongwadae",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheongwadae_description_en",
+      "query": "Also known as the Blue House, it was the former executive office and official residence of South Korean presidents.",
+      "expected_landmark_id": "cheongwadae",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheongwadae_alias_000",
+      "query": "청와대",
+      "expected_landmark_id": "cheongwadae",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheongwadae_alias_001",
+      "query": "블루하우스",
+      "expected_landmark_id": "cheongwadae",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "cheongwadae_alias_002",
+      "query": "대통령 관저",
+      "expected_landmark_id": "cheongwadae",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_name_ko",
+      "query": "경복궁",
+      "expected_landmark_id": "gyeongbokgung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_name_en",
+      "query": "Gyeongbokgung Palace",
+      "expected_landmark_id": "gyeongbokgung",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_description_ko",
+      "query": "조선 왕조의 법궁으로, 광화문과 근정문, 근정전 등 여러 주요 전각과 문을 포함하는 대표 궁궐입니다.",
+      "expected_landmark_id": "gyeongbokgung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_description_en",
+      "query": "Gyeongbokgung Palace is the main royal palace of the Joseon Dynasty, grouping major gates and halls such as Gwanghwamun, Geunjeongmun, and Geunjeongjeon.",
+      "expected_landmark_id": "gyeongbokgung",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_alias_000",
+      "query": "경복궁",
+      "expected_landmark_id": "gyeongbokgung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_alias_001",
+      "query": "조선 왕궁",
+      "expected_landmark_id": "gyeongbokgung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_alias_002",
+      "query": "Gyeongbokgung Palace",
+      "expected_landmark_id": "gyeongbokgung",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_name_ko",
+      "query": "덕수궁",
+      "expected_landmark_id": "deoksugung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_name_en",
+      "query": "Deoksugung",
+      "expected_landmark_id": "deoksugung",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_description_ko",
+      "query": "중구 정동에 위치한 조선과 대한제국의 궁궐로, 한국 전통 건축과 서양식 석조전 건물이 조화를 이루는 곳입니다.",
+      "expected_landmark_id": "deoksugung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_description_en",
+      "query": "A palace in Jung-gu, famous for its elegant stone-wall path and the neoclassic style Seokjojeon Hall.",
+      "expected_landmark_id": "deoksugung",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_alias_000",
+      "query": "덕수궁",
+      "expected_landmark_id": "deoksugung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_alias_001",
+      "query": "경운궁",
+      "expected_landmark_id": "deoksugung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_alias_002",
+      "query": "덕수궁 돌담길",
+      "expected_landmark_id": "deoksugung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gwanghwamun_name_ko",
+      "query": "광화문",
+      "expected_landmark_id": "gwanghwamun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gwanghwamun_name_en",
+      "query": "Gwanghwamun",
+      "expected_landmark_id": "gwanghwamun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gwanghwamun_description_ko",
+      "query": "경복궁의 남쪽에 있는 정문이자 서울의 상징적인 랜드마크로, 세종대로 광장 중심에 우뚝 서 있습니다.",
+      "expected_landmark_id": "gwanghwamun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gwanghwamun_description_en",
+      "query": "The main and largest gate of Gyeongbokgung Palace, serving as a landmark and historical heart of Seoul.",
+      "expected_landmark_id": "gwanghwamun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gwanghwamun_alias_000",
+      "query": "광화문",
+      "expected_landmark_id": "gwanghwamun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gwanghwamun_alias_001",
+      "query": "경복궁 정문",
+      "expected_landmark_id": "gwanghwamun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gwanghwamun_alias_002",
+      "query": "세종대로 광화문",
+      "expected_landmark_id": "gwanghwamun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jogyesa_name_ko",
+      "query": "조계사",
+      "expected_landmark_id": "jogyesa",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jogyesa_name_en",
+      "query": "Jogyesa",
+      "expected_landmark_id": "jogyesa",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jogyesa_description_ko",
+      "query": "종로구 견지동에 위치한 대한불교조계종의 총본산이자 서울 도심 속 힐링을 주는 웅장한 사찰입니다.",
+      "expected_landmark_id": "jogyesa",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jogyesa_description_en",
+      "query": "The chief temple of the Jogye Order of Korean Buddhism, offering a peaceful sanctuary in the heart of Seoul.",
+      "expected_landmark_id": "jogyesa",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jogyesa_alias_000",
+      "query": "조계사",
+      "expected_landmark_id": "jogyesa",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jogyesa_alias_001",
+      "query": "조계종 총본산",
+      "expected_landmark_id": "jogyesa",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jogyesa_alias_002",
+      "query": "인사동 사찰",
+      "expected_landmark_id": "jogyesa",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jongmyo_shrine_name_ko",
+      "query": "종묘",
+      "expected_landmark_id": "jongmyo_shrine",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jongmyo_shrine_name_en",
+      "query": "Jongmyo Shrine",
+      "expected_landmark_id": "jongmyo_shrine",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jongmyo_shrine_description_ko",
+      "query": "조선 시대 역대 왕과 왕비의 신주를 모시고 제사를 지내던 사당으로, 유네스코 세계문화유산으로 지정된 곳입니다.",
+      "expected_landmark_id": "jongmyo_shrine",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jongmyo_shrine_description_en",
+      "query": "A Confucian shrine dedicated to the memorial services for Joseon kings and queens, designated as a UNESCO World Heritage site.",
+      "expected_landmark_id": "jongmyo_shrine",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jongmyo_shrine_alias_000",
+      "query": "종묘",
+      "expected_landmark_id": "jongmyo_shrine",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jongmyo_shrine_alias_001",
+      "query": "종묘 사당",
+      "expected_landmark_id": "jongmyo_shrine",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "jongmyo_shrine_alias_002",
+      "query": "종묘 정전",
+      "expected_landmark_id": "jongmyo_shrine",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "mmca_seoul_name_ko",
+      "query": "국립현대미술관 서울",
+      "expected_landmark_id": "mmca_seoul",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "mmca_seoul_name_en",
+      "query": "MMCA Seoul",
+      "expected_landmark_id": "mmca_seoul",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "mmca_seoul_description_ko",
+      "query": "종로구 삼청동 근처에 위치한 대한민국 대표 국립 미술관으로, 한국 및 전 세계 현대 미술의 정수를 관람할 수 있습니다.",
+      "expected_landmark_id": "mmca_seoul",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "mmca_seoul_description_en",
+      "query": "National Museum of Modern and Contemporary Art, Seoul, showcasing premier modern art collections and exhibitions.",
+      "expected_landmark_id": "mmca_seoul",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "mmca_seoul_alias_000",
+      "query": "국립현대미술관",
+      "expected_landmark_id": "mmca_seoul",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "mmca_seoul_alias_001",
+      "query": "현대미술관 서울관",
+      "expected_landmark_id": "mmca_seoul",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "mmca_seoul_alias_002",
+      "query": "MMCA",
+      "expected_landmark_id": "mmca_seoul",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "mmca_seoul_alias_003",
+      "query": "삼청동 미술관",
+      "expected_landmark_id": "mmca_seoul",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "naksan_park_name_ko",
+      "query": "낙산공원",
+      "expected_landmark_id": "naksan_park",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "naksan_park_name_en",
+      "query": "Naksan Park",
+      "expected_landmark_id": "naksan_park",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "naksan_park_description_ko",
+      "query": "종로구 낙산에 조성된 공원으로, 조선 시대 성곽길을 따라 걸으며 서울 도심의 아름다운 야경을 감상할 수 있는 명소입니다.",
+      "expected_landmark_id": "naksan_park",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "naksan_park_description_en",
+      "query": "A scenic park situated on Naksan Mountain, offering historical city fortress walls and panoramic night views of Seoul.",
+      "expected_landmark_id": "naksan_park",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "naksan_park_alias_000",
+      "query": "낙산공원",
+      "expected_landmark_id": "naksan_park",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "naksan_park_alias_001",
+      "query": "낙산 성곽길",
+      "expected_landmark_id": "naksan_park",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "naksan_park_alias_002",
+      "query": "대학로 야경공원",
+      "expected_landmark_id": "naksan_park",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "statue_of_king_sejong_name_ko",
+      "query": "세종대왕 동상",
+      "expected_landmark_id": "statue_of_king_sejong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "statue_of_king_sejong_name_en",
+      "query": "Statue of King Sejong",
+      "expected_landmark_id": "statue_of_king_sejong",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "statue_of_king_sejong_description_ko",
+      "query": "광화문 광장 중심부에 건립된 조선 제4대 성군 세종대왕의 거대 청동 좌상으로, 한글 창제의 위업을 기리고 있습니다.",
+      "expected_landmark_id": "statue_of_king_sejong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "statue_of_king_sejong_description_en",
+      "query": "The iconic bronze statue of King Sejong the Great, located at Gwanghwamun Square, commemorating the invention of Hangeul.",
+      "expected_landmark_id": "statue_of_king_sejong",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "statue_of_king_sejong_alias_000",
+      "query": "세종대왕 동상",
+      "expected_landmark_id": "statue_of_king_sejong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "statue_of_king_sejong_alias_001",
+      "query": "광화문 세종대왕",
+      "expected_landmark_id": "statue_of_king_sejong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "statue_of_king_sejong_alias_002",
+      "query": "세종대왕",
+      "expected_landmark_id": "statue_of_king_sejong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongjeon_name_ko",
+      "query": "창경궁 명정전",
+      "expected_landmark_id": "changgyeonggung_myeongjeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongjeon_name_en",
+      "query": "Changgyeonggung Myeongjeongjeon",
+      "expected_landmark_id": "changgyeonggung_myeongjeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongjeon_description_ko",
+      "query": "창경궁의 정전으로, 조선 시대의 궁궐 정전 중 가장 오래된 목조 건축물입니다. 국보 제226호로 지정되어 있습니다.",
+      "expected_landmark_id": "changgyeonggung_myeongjeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongjeon_description_en",
+      "query": "Myeongjeongjeon is the main throne hall of Changgyeonggung Palace, and is the oldest remaining wooden throne hall of the Joseon Dynasty.",
+      "expected_landmark_id": "changgyeonggung_myeongjeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongjeon_alias_000",
+      "query": "명정전",
+      "expected_landmark_id": "changgyeonggung_myeongjeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongjeon_alias_001",
+      "query": "창경궁 정전",
+      "expected_landmark_id": "changgyeonggung_myeongjeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongjeon_alias_002",
+      "query": "명정전 본당",
+      "expected_landmark_id": "changgyeonggung_myeongjeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongmun_name_ko",
+      "query": "창경궁 명정문",
+      "expected_landmark_id": "changgyeonggung_myeongjeongmun",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongmun_name_en",
+      "query": "Changgyeonggung Myeongjeongmun",
+      "expected_landmark_id": "changgyeonggung_myeongjeongmun",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongmun_description_ko",
+      "query": "창경궁 명정전으로 향하는 정문으로, 정전의 정문답게 웅장하고 견고한 목조 양식을 자랑합니다. 보물 제385호입니다.",
+      "expected_landmark_id": "changgyeonggung_myeongjeongmun",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongmun_description_en",
+      "query": "Myeongjeongmun is the main gate leading to the throne hall Myeongjeongjeon in Changgyeonggung Palace.",
+      "expected_landmark_id": "changgyeonggung_myeongjeongmun",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_myeongjeongmun_alias_000",
+      "query": "명정문",
+      "expected_landmark_id": "changgyeonggung_myeongjeongmun",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_octagonal_seven_story_stone_pagoda_name_ko",
+      "query": "창경궁 팔각칠층석탑",
+      "expected_landmark_id": "changgyeonggung_octagonal_seven_story_stone_pagoda",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_octagonal_seven_story_stone_pagoda_name_en",
+      "query": "Changgyeonggung Octagonal Seven-story Stone Pagoda",
+      "expected_landmark_id": "changgyeonggung_octagonal_seven_story_stone_pagoda",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_octagonal_seven_story_stone_pagoda_description_ko",
+      "query": "창경궁 내 춘당지 인근에 서 있는 조선 시대의 석탑으로, 독특한 팔각 형태의 7층 구조를 띠고 있습니다. 보물 제1119호입니다.",
+      "expected_landmark_id": "changgyeonggung_octagonal_seven_story_stone_pagoda",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_octagonal_seven_story_stone_pagoda_description_en",
+      "query": "An octagonal seven-story stone pagoda located near Chundangji Pond in Changgyeonggung Palace, dating back to the Joseon Dynasty.",
+      "expected_landmark_id": "changgyeonggung_octagonal_seven_story_stone_pagoda",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_octagonal_seven_story_stone_pagoda_alias_000",
+      "query": "팔각칠층석탑",
+      "expected_landmark_id": "changgyeonggung_octagonal_seven_story_stone_pagoda",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_octagonal_seven_story_stone_pagoda_alias_001",
+      "query": "창경궁 석탑",
+      "expected_landmark_id": "changgyeonggung_octagonal_seven_story_stone_pagoda",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_octagonal_seven_story_stone_pagoda_alias_002",
+      "query": "창경궁 칠층석탑",
+      "expected_landmark_id": "changgyeonggung_octagonal_seven_story_stone_pagoda",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_okcheongyo_name_ko",
+      "query": "창경궁 옥천교",
+      "expected_landmark_id": "changgyeonggung_okcheongyo",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_okcheongyo_name_en",
+      "query": "Changgyeonggung Okcheongyo",
+      "expected_landmark_id": "changgyeonggung_okcheongyo",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_okcheongyo_description_ko",
+      "query": "창경궁 홍화문을 지나 명정문으로 갈 때 건너는 조선 시대의 돌다리로, 무지개 모양의 아치교 형태를 띠고 있습니다. 보물 제386호입니다.",
+      "expected_landmark_id": "changgyeonggung_okcheongyo",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_okcheongyo_description_en",
+      "query": "Okcheongyo is a stone bridge built in the Joseon Dynasty, crossed when entering Changgyeonggung Palace through Honghwamun.",
+      "expected_landmark_id": "changgyeonggung_okcheongyo",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_okcheongyo_alias_000",
+      "query": "옥천교",
+      "expected_landmark_id": "changgyeonggung_okcheongyo",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_okcheongyo_alias_001",
+      "query": "창경궁 금천교",
+      "expected_landmark_id": "changgyeonggung_okcheongyo",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_okcheongyo_alias_002",
+      "query": "창경궁 돌다리",
+      "expected_landmark_id": "changgyeonggung_okcheongyo",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_tongmyeongjeon_name_ko",
+      "query": "창경궁 통명전",
+      "expected_landmark_id": "changgyeonggung_tongmyeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_tongmyeongjeon_name_en",
+      "query": "Changgyeonggung Tongmyeongjeon",
+      "expected_landmark_id": "changgyeonggung_tongmyeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_tongmyeongjeon_description_ko",
+      "query": "창경궁의 연경당과 함께 왕비의 침전이자 내전의 으뜸 건물로, 지붕에 용마루가 없는 독특한 건축적 특징을 가지고 있습니다. 국보 제842호입니다.",
+      "expected_landmark_id": "changgyeonggung_tongmyeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_tongmyeongjeon_description_en",
+      "query": "Tongmyeongjeon was the queen's residence in Changgyeonggung Palace, notable for having no main ridge on its roof.",
+      "expected_landmark_id": "changgyeonggung_tongmyeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_tongmyeongjeon_alias_000",
+      "query": "통명전",
+      "expected_landmark_id": "changgyeonggung_tongmyeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_tongmyeongjeon_alias_001",
+      "query": "창경궁 내전",
+      "expected_landmark_id": "changgyeonggung_tongmyeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "changgyeonggung_tongmyeongjeon_alias_002",
+      "query": "통명전 연회장",
+      "expected_landmark_id": "changgyeonggung_tongmyeongjeon",
+      "expected_parent_landmark_id": "changgyeonggung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_daehanmun_name_ko",
+      "query": "덕수궁 대한문",
+      "expected_landmark_id": "deoksugung_daehanmun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_daehanmun_name_en",
+      "query": "Deoksugung Daehanmun",
+      "expected_landmark_id": "deoksugung_daehanmun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_daehanmun_description_ko",
+      "query": "덕수궁의 정문으로, 본래 이름은 대안문이었으나 1906년 대한문으로 이름을 바꾸었습니다. 수문장 교대식이 열리는 명소입니다.",
+      "expected_landmark_id": "deoksugung_daehanmun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_daehanmun_description_en",
+      "query": "Daehanmun is the main gate of Deoksugung Palace, famous for the Royal Guard Changing Ceremony.",
+      "expected_landmark_id": "deoksugung_daehanmun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_daehanmun_alias_000",
+      "query": "대한문",
+      "expected_landmark_id": "deoksugung_daehanmun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_daehanmun_alias_001",
+      "query": "덕수궁 정문",
+      "expected_landmark_id": "deoksugung_daehanmun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_daehanmun_alias_002",
+      "query": "대한문 수문장",
+      "expected_landmark_id": "deoksugung_daehanmun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_hamnyeongjeon_name_ko",
+      "query": "덕수궁 함녕전",
+      "expected_landmark_id": "deoksugung_hamnyeongjeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_hamnyeongjeon_name_en",
+      "query": "Deoksugung Hamnyeongjeon",
+      "expected_landmark_id": "deoksugung_hamnyeongjeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_hamnyeongjeon_description_ko",
+      "query": "고종 황제가 거처하며 침전으로 사용하던 곳으로, 1919년 고종 황제가 승하하신 역사적인 장소이기도 합니다. 보물 제820호입니다.",
+      "expected_landmark_id": "deoksugung_hamnyeongjeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_hamnyeongjeon_description_en",
+      "query": "Hamnyeongjeon was the bedchamber of Emperor Gojong, and the historic place where he passed away in 1919.",
+      "expected_landmark_id": "deoksugung_hamnyeongjeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_hamnyeongjeon_alias_000",
+      "query": "함녕전",
+      "expected_landmark_id": "deoksugung_hamnyeongjeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_hamnyeongjeon_alias_001",
+      "query": "고종 침전",
+      "expected_landmark_id": "deoksugung_hamnyeongjeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwajeon_name_ko",
+      "query": "덕수궁 중화전",
+      "expected_landmark_id": "deoksugung_junghwajeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwajeon_name_en",
+      "query": "Deoksugung Junghwajeon",
+      "expected_landmark_id": "deoksugung_junghwajeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwajeon_description_ko",
+      "query": "덕수궁의 정전으로, 대한제국 시기 즉위식과 조하 의례 등 국가 공식 행사가 치러진 상징적인 목조 건물입니다. 보물 제819호입니다.",
+      "expected_landmark_id": "deoksugung_junghwajeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwajeon_description_en",
+      "query": "Junghwajeon is the main throne hall of Deoksugung Palace, where official state affairs and ceremonies were held during the Korean Empire.",
+      "expected_landmark_id": "deoksugung_junghwajeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwajeon_alias_000",
+      "query": "중화전",
+      "expected_landmark_id": "deoksugung_junghwajeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwajeon_alias_001",
+      "query": "덕수궁 정전",
+      "expected_landmark_id": "deoksugung_junghwajeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwajeon_alias_002",
+      "query": "덕수궁 본당",
+      "expected_landmark_id": "deoksugung_junghwajeon",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwamun_name_ko",
+      "query": "덕수궁 중화문",
+      "expected_landmark_id": "deoksugung_junghwamun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwamun_name_en",
+      "query": "Deoksugung Junghwamun",
+      "expected_landmark_id": "deoksugung_junghwamun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwamun_description_ko",
+      "query": "덕수궁 중화전의 정문으로, 정전의 위엄을 돋보이게 하는 당당한 기풍의 목조 문입니다. 보물 제819호에 함께 지정되어 있습니다.",
+      "expected_landmark_id": "deoksugung_junghwamun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwamun_description_en",
+      "query": "Junghwamun is the main gate leading to the throne hall Junghwajeon in Deoksugung Palace.",
+      "expected_landmark_id": "deoksugung_junghwamun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "deoksugung_junghwamun_alias_000",
+      "query": "중화문",
+      "expected_landmark_id": "deoksugung_junghwamun",
+      "expected_parent_landmark_id": "deoksugung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongjeon_name_ko",
+      "query": "경복궁 근정전",
+      "expected_landmark_id": "gyeongbokgung_geunjeongjeon",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongjeon_name_en",
+      "query": "Gyeongbokgung Geunjeongjeon",
+      "expected_landmark_id": "gyeongbokgung_geunjeongjeon",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongjeon_description_ko",
+      "query": "조선 왕조의 법전이자 경복궁의 중심 건물로, 왕의 즉위식과 하례, 외국 사신 접대 등이 치러지던 가장 권위 있는 국보 건축물입니다.",
+      "expected_landmark_id": "gyeongbokgung_geunjeongjeon",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongjeon_description_en",
+      "query": "Geunjeongjeon is the main throne hall of Gyeongbokgung Palace, the premier symbol of Joseon royal authority.",
+      "expected_landmark_id": "gyeongbokgung_geunjeongjeon",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongjeon_alias_000",
+      "query": "근정전",
+      "expected_landmark_id": "gyeongbokgung_geunjeongjeon",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongjeon_alias_001",
+      "query": "경복궁 정전",
+      "expected_landmark_id": "gyeongbokgung_geunjeongjeon",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongjeon_alias_002",
+      "query": "근정전 본당",
+      "expected_landmark_id": "gyeongbokgung_geunjeongjeon",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "n_seoul_tower_name_ko",
+      "query": "N서울타워",
+      "expected_landmark_id": "n_seoul_tower",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "n_seoul_tower_name_en",
+      "query": "N Seoul Tower",
+      "expected_landmark_id": "n_seoul_tower",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "n_seoul_tower_description_ko",
+      "query": "남산 정상에 우뚝 솟은 높이 236.7m의 송신탑이자 종합 관광 탑으로, 서울 전체를 360도 조망할 수 있는 대표적 랜드마크입니다.",
+      "expected_landmark_id": "n_seoul_tower",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "n_seoul_tower_description_en",
+      "query": "N Seoul Tower, located at the peak of Namsan Mountain, is a 236.7m communication and observation tower offering 360-degree views of Seoul.",
+      "expected_landmark_id": "n_seoul_tower",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "n_seoul_tower_alias_000",
+      "query": "N서울타워",
+      "expected_landmark_id": "n_seoul_tower",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "n_seoul_tower_alias_001",
+      "query": "남산타워",
+      "expected_landmark_id": "n_seoul_tower",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "n_seoul_tower_alias_002",
+      "query": "서울타워",
+      "expected_landmark_id": "n_seoul_tower",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "tapgol_park_palgakjeong_name_ko",
+      "query": "탑골공원 팔각정",
+      "expected_landmark_id": "tapgol_park_palgakjeong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "tapgol_park_palgakjeong_name_en",
+      "query": "Tapgol Park Palgakjeong",
+      "expected_landmark_id": "tapgol_park_palgakjeong",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "official_name",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "tapgol_park_palgakjeong_description_ko",
+      "query": "서울 종로의 탑골공원 내에 자리한 팔각 모양의 누각으로, 1919년 3·1 독립선언서가 낭독되었던 유서 깊은 독립운동의 성지입니다.",
+      "expected_landmark_id": "tapgol_park_palgakjeong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "tapgol_park_palgakjeong_description_en",
+      "query": "Palgakjeong is an octagonal pavilion in Tapgol Park, where the Proclamation of Independence was read during the March 1st Movement in 1919.",
+      "expected_landmark_id": "tapgol_park_palgakjeong",
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "description",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "tapgol_park_palgakjeong_alias_000",
+      "query": "탑골공원 팔각정",
+      "expected_landmark_id": "tapgol_park_palgakjeong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "tapgol_park_palgakjeong_alias_001",
+      "query": "팔각정",
+      "expected_landmark_id": "tapgol_park_palgakjeong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "tapgol_park_palgakjeong_alias_002",
+      "query": "탑골공원",
+      "expected_landmark_id": "tapgol_park_palgakjeong",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard"
+    },
+    {
+      "query_id": "oos_000",
+      "query": "에펠탑",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope"
+    },
+    {
+      "query_id": "oos_001",
+      "query": "부산 바다",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope"
+    },
+    {
+      "query_id": "oos_002",
+      "query": "맛집 추천",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope"
+    },
+    {
+      "query_id": "oos_003",
+      "query": "Eiffel Tower",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope"
+    },
+    {
+      "query_id": "oos_004",
+      "query": "beach restaurant",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope"
+    }
+  ]
+}

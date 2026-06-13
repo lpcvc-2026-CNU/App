@@ -48,7 +48,7 @@ class OnnxInferenceService {
     try {
       _lastInitError = null;
       OrtEnv.instance.init();
-      
+
       // preprocessing.json 동적 파싱 로드 (P2)
       await _loadPreprocessingConfig();
 
@@ -67,20 +67,21 @@ class OnnxInferenceService {
       );
 
       final preparedFiles = await _prepareModelFiles();
-      
+
       _imageSession = OrtSession.fromFile(
         File(preparedFiles['modelPath']!),
         imageSessionOptions,
       );
-      
+
       // text encoder 세션 로드 준비
       _textSession = OrtSession.fromFile(
         File(preparedFiles['textModelPath']!),
         textSessionOptions,
       );
 
-      print('ONNX sessions initialized: Image=${preparedFiles['modelPath']}, Text=${preparedFiles['textModelPath']}');
-      
+      print(
+          'ONNX sessions initialized: Image=${preparedFiles['modelPath']}, Text=${preparedFiles['textModelPath']}');
+
       // 모델 메타데이터 스펙 정합성 검증 레이어 탑재 (P2)
       await _verifyModelMetadata();
     } catch (e, stackTrace) {
@@ -96,27 +97,33 @@ class OnnxInferenceService {
 
   Future<Map<String, String>> _prepareModelFiles() async {
     if (Platform.isAndroid) {
-      final result =
-          await _assetChannel.invokeMapMethod<String, String>(
+      final result = await _assetChannel.invokeMapMethod<String, String>(
             'prepareOnnxAssets',
           ) ??
           const {};
-      
+
       final modelPath = result['modelPath'];
       final dataPath = result['dataPath'];
       final textModelPath = result['textModelPath'];
       final textDataPath = result['textDataPath'];
 
-      if (modelPath == null || modelPath.isEmpty ||
-          dataPath == null || dataPath.isEmpty ||
-          textModelPath == null || textModelPath.isEmpty ||
-          textDataPath == null || textDataPath.isEmpty) {
+      if (modelPath == null ||
+          modelPath.isEmpty ||
+          dataPath == null ||
+          dataPath.isEmpty ||
+          textModelPath == null ||
+          textModelPath.isEmpty ||
+          textDataPath == null ||
+          textDataPath.isEmpty) {
         throw Exception('Android asset preparation returned incomplete paths');
       }
 
-      if (!await File(modelPath).exists() || !await File(dataPath).exists() ||
-          !await File(textModelPath).exists() || !await File(textDataPath).exists()) {
-        throw Exception('Prepared ONNX files are missing on Android filesystem');
+      if (!await File(modelPath).exists() ||
+          !await File(dataPath).exists() ||
+          !await File(textModelPath).exists() ||
+          !await File(textDataPath).exists()) {
+        throw Exception(
+            'Prepared ONNX files are missing on Android filesystem');
       }
 
       return {
@@ -140,7 +147,7 @@ class OnnxInferenceService {
     final txtDataName = textInfo['external_data'] as String;
 
     final appDir = await getApplicationDocumentsDirectory();
-    
+
     final imgModelFile = File('${appDir.path}/$imgOnnxName');
     final imgDataFile = File('${appDir.path}/$imgDataName');
     final txtModelFile = File('${appDir.path}/$txtOnnxName');
@@ -258,9 +265,42 @@ class OnnxInferenceService {
 
     final List<double> raw;
     if (outputTensor.isNotEmpty && outputTensor[0] is List) {
-      raw = (outputTensor[0] as List)
-          .map((e) => (e as num).toDouble())
-          .toList();
+      raw =
+          (outputTensor[0] as List).map((e) => (e as num).toDouble()).toList();
+    } else {
+      raw = outputTensor.map((e) => (e as num).toDouble()).toList();
+    }
+
+    return _l2Normalize(raw);
+  }
+
+  Future<List<double>> extractTextEmbedding(List<int> textTokens) async {
+    await initializeOnnxModel();
+    if (_textSession == null) {
+      throw Exception(_lastInitError ?? 'Text session not initialized');
+    }
+
+    final tokenData = Int64List.fromList(textTokens);
+    final shape = [1, textTokens.length];
+    final tensor = OrtValueTensor.createTensorWithDataList(tokenData, shape);
+    final runOptions = OrtRunOptions();
+
+    final outputs = _textSession!.run(
+      runOptions,
+      {'text_tokens': tensor},
+    );
+    final outputTensor = outputs[0]?.value as List<dynamic>;
+
+    tensor.release();
+    runOptions.release();
+    for (final output in outputs) {
+      output?.release();
+    }
+
+    final List<double> raw;
+    if (outputTensor.isNotEmpty && outputTensor[0] is List) {
+      raw =
+          (outputTensor[0] as List).map((e) => (e as num).toDouble()).toList();
     } else {
       raw = outputTensor.map((e) => (e as num).toDouble()).toList();
     }
@@ -282,24 +322,29 @@ class OnnxInferenceService {
 
   Future<void> _loadPreprocessingConfig() async {
     try {
-      final jsonString = await rootBundle.loadString('assets/mobile_artifacts_fp16/preprocessing.json');
+      final jsonString = await rootBundle
+          .loadString('assets/mobile_artifacts_fp16/preprocessing.json');
       final Map<String, dynamic> config = json.decode(jsonString);
-      
+
       _imageSize = config['image_size'] as int? ?? 224;
-      
+
       final meanList = config['image_mean'] ?? config['mean'];
       if (meanList is List) {
         _mean = meanList.map((e) => (e as num).toDouble()).toList();
       }
-      
+
       final stdList = config['image_std'] ?? config['std'];
       if (stdList is List) {
         _std = stdList.map((e) => (e as num).toDouble()).toList();
       }
 
-      _resizeScale = (config['resize_short_side_scale'] ?? config['resize_scale'] as num?)?.toDouble() ?? 1.15;
-      
-      print('ONNX preprocessing configured: Size=$_imageSize, Mean=$_mean, Std=$_std, Scale=$_resizeScale');
+      _resizeScale =
+          (config['resize_short_side_scale'] ?? config['resize_scale'] as num?)
+                  ?.toDouble() ??
+              1.15;
+
+      print(
+          'ONNX preprocessing configured: Size=$_imageSize, Mean=$_mean, Std=$_std, Scale=$_resizeScale');
     } catch (e) {
       print('Failed to load preprocessing config, using fallback: $e');
     }
@@ -322,13 +367,16 @@ class OnnxInferenceService {
       List<String> mismatches = [];
 
       if (modelId != expectedModelId) {
-        mismatches.add('Model ID Mismatch: Expected $expectedModelId, Got $modelId');
+        mismatches
+            .add('Model ID Mismatch: Expected $expectedModelId, Got $modelId');
       }
       if (precision != expectedPrecision) {
-        mismatches.add('Precision Mismatch: Expected $expectedPrecision, Got $precision');
+        mismatches.add(
+            'Precision Mismatch: Expected $expectedPrecision, Got $precision');
       }
       if (classCount != expectedClassCount) {
-        mismatches.add('Class Count Mismatch: Expected $expectedClassCount, Got $classCount');
+        mismatches.add(
+            'Class Count Mismatch: Expected $expectedClassCount, Got $classCount');
       }
 
       if (mismatches.isNotEmpty) {
@@ -340,7 +388,8 @@ class OnnxInferenceService {
         _modelSpecWarning = warningMsg;
       } else {
         _modelSpecWarning = null;
-        print('✅ ONNX model metadata verified successfully. Spec matches: $expectedModelId, $expectedPrecision, $expectedClassCount classes.');
+        print(
+            '✅ ONNX model metadata verified successfully. Spec matches: $expectedModelId, $expectedPrecision, $expectedClassCount classes.');
       }
     } catch (e) {
       print('Failed to verify model metadata: $e');

@@ -38,6 +38,11 @@ class ModelIntegrationContractTest(unittest.TestCase):
             "labels_master.json",
             "config.yaml",
             "confidence_policy.json",
+            "tokenizer_bundle.json",
+            "text_index.json",
+            "text_search_policy.json",
+            "text_query_regression_set.json",
+            "text_search_eval_report.json",
         ):
             with self.subTest(file_name=file_name):
                 self.assertTrue((ARTIFACT_DIR / file_name).exists())
@@ -97,6 +102,8 @@ class ModelIntegrationContractTest(unittest.TestCase):
 
     def test_score_contract_and_keyword_text_search_are_separated(self):
         local_api = read_text("lib/api/local_api_client_impl.dart")
+        semantic_service = read_text("lib/services/semantic_text_search_service.dart")
+        keyword_service = read_text("lib/services/keyword_search_service.dart")
         result_screen = read_text("lib/ui/screens/result_screen.dart")
 
         for token in (
@@ -104,9 +111,6 @@ class ModelIntegrationContractTest(unittest.TestCase):
             "'display_score'",
             "'score_type'",
             "'cosine_similarity'",
-            "'keyword_match'",
-            "'keyword_score'",
-            "'semantic_score'",
             "'decision_status'",
             "'top3_scores'",
             "'margin'",
@@ -116,8 +120,79 @@ class ModelIntegrationContractTest(unittest.TestCase):
             with self.subTest(token=token):
                 self.assertIn(token, local_api)
 
+        for token in (
+            "'semantic_text_fusion'",
+            "'keyword_score'",
+            "'semantic_score'",
+            "'final_text_score'",
+            "'matched_text'",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, semantic_service)
+
+        self.assertIn("scoreLandmarks", keyword_service)
+        self.assertIn("LIKE", keyword_service)
         self.assertIn("display_score", result_screen)
         self.assertNotRegex(result_screen, re.compile(r"정답\\s*확률|확률"))
+
+    def test_semantic_text_artifacts_are_contract_valid(self):
+        manifest = load_json("assets/mobile_artifacts_fp16/manifest.json")
+        info = load_json("assets/landmark_info.json")["items"]
+        info_ids = {item["landmark_id"] for item in info}
+        tokenizer_bundle = load_json("assets/mobile_artifacts_fp16/tokenizer_bundle.json")
+        text_index = load_json("assets/mobile_artifacts_fp16/text_index.json")
+        text_policy = load_json("assets/mobile_artifacts_fp16/text_search_policy.json")
+        regression = load_json("assets/mobile_artifacts_fp16/text_query_regression_set.json")
+        eval_report = load_json("assets/mobile_artifacts_fp16/text_search_eval_report.json")
+
+        self.assertEqual(tokenizer_bundle["context_length"], 77)
+        self.assertGreater(len(tokenizer_bundle["fixtures"]), 0)
+
+        text_items = text_index["items"]
+        self.assertGreater(len(text_items), 0)
+        for item in text_items:
+            with self.subTest(text_id=item["text_id"]):
+                self.assertIn(item["landmark_id"], info_ids)
+                self.assertEqual(len(item["embedding"]), manifest["embedding_dim"])
+
+        for key in (
+            "semantic_weight",
+            "keyword_weight",
+            "matched_threshold",
+            "ambiguous_margin",
+            "out_of_scope_threshold",
+            "no_keyword_oos_margin",
+            "no_keyword_match_threshold",
+        ):
+            with self.subTest(policy_key=key):
+                self.assertIsInstance(text_policy[key], (int, float))
+
+        self.assertGreater(len(regression["items"]), 0)
+        for query in regression["items"]:
+            expected = query.get("expected_landmark_id")
+            if expected is not None:
+                self.assertIn(expected, info_ids)
+
+        self.assertEqual(eval_report["query_count"], len(regression["items"]))
+        self.assertGreaterEqual(eval_report["top1_accuracy"], 0.95)
+        self.assertGreaterEqual(eval_report["top3_recall"], 0.95)
+        self.assertGreaterEqual(eval_report["out_of_scope_accuracy"], 0.8)
+
+    def test_semantic_text_dart_services_are_wired(self):
+        local_api = read_text("lib/api/local_api_client_impl.dart")
+        semantic_service = read_text("lib/services/semantic_text_search_service.dart")
+        tokenizer_service = read_text("lib/services/tokenizer_service.dart")
+        text_index_repository = read_text("lib/data/text_index_repository.dart")
+        onnx_service = read_text("lib/services/onnx_inference_service.dart")
+
+        self.assertIn("SemanticTextSearchService(_onnxService)", local_api)
+        self.assertIn("extractTextEmbedding(tokens)", semantic_service)
+        self.assertIn("no_keyword_oos_margin", semantic_service)
+        self.assertIn("no_keyword_match_threshold", semantic_service)
+        self.assertIn("tokenizer_bundle.json", tokenizer_service)
+        self.assertIn("text_index.json", text_index_repository)
+        self.assertIn("text_search_policy.json", semantic_service)
+        self.assertIn("Int64List.fromList(textTokens)", onnx_service)
 
     def test_confidence_policy_is_loaded_from_asset(self):
         policy = load_json("assets/mobile_artifacts_fp16/confidence_policy.json")
