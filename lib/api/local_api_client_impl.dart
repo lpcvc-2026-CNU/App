@@ -255,6 +255,8 @@ class LocalApiClientImpl implements LocalApiClient {
     final stopwatch = Stopwatch()..start();
 
     // ── 텍스트 검색 모드 ────────────────────────────────────────────────────
+    // 현재 앱 검색은 SQLite LIKE 기반 keyword search이다.
+    // text encoder ONNX는 artifact contract에 포함되어 있지만 semantic search는 후속 작업이다.
     if (textQuery != null && textQuery.trim().isNotEmpty) {
       final db = await _dbHelper.database;
       final keyword = textQuery.trim();

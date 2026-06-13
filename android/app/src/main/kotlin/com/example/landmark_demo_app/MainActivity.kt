@@ -99,11 +99,15 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun copyAssetStream(assetPath: String, destination: File) {
-        assets.open(assetPath).use { input ->
-            destination.outputStream().use { output ->
-                input.copyTo(output, DEFAULT_BUFFER_SIZE)
-                output.flush()
+        try {
+            assets.open(assetPath).use { input ->
+                destination.outputStream().use { output ->
+                    input.copyTo(output, DEFAULT_BUFFER_SIZE)
+                    output.flush()
+                }
             }
+        } catch (e: Exception) {
+            throw RuntimeException("Missing or unreadable ONNX asset: $assetPath", e)
         }
     }
 }

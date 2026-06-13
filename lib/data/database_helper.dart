@@ -21,7 +21,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -80,7 +80,7 @@ class DatabaseHelper {
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 5) {
+    if (oldVersion < 6) {
       await db.execute('DROP TABLE IF EXISTS candidate_texts');
       await db.execute('DROP TABLE IF EXISTS landmarks');
       await db.execute('DROP TABLE IF EXISTS search_logs');

@@ -168,9 +168,13 @@ class OnnxInferenceService {
   }
 
   Future<void> _copyAsset(String assetPath, File destination) async {
-    final data = await rootBundle.load(assetPath);
-    final bytes = data.buffer.asUint8List();
-    await destination.writeAsBytes(bytes, flush: true);
+    try {
+      final data = await rootBundle.load(assetPath);
+      final bytes = data.buffer.asUint8List();
+      await destination.writeAsBytes(bytes, flush: true);
+    } catch (e) {
+      throw Exception('Missing or unreadable model artifact asset: $assetPath');
+    }
   }
 
   void release() {

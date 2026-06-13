@@ -45,6 +45,7 @@ class DetailScreen extends StatelessWidget {
           final data = snapshot.data ?? {};
           final rawName = (data['name'] ?? landmarkId).toString();
           final parentName = data['parent_name'] as String?;
+          final parentId = data['parent_landmark_id'] as String?;
           final name = (parentName != null && parentName.isNotEmpty)
               ? '$parentName · $rawName'
               : rawName;
@@ -58,20 +59,7 @@ class DetailScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   child: AspectRatio(
                     aspectRatio: 16 / 10,
-                    child: Image.asset(
-                      'assets/hero_images/$landmarkId.jpg',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[850],
-                        child: const Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            size: 56,
-                            color: Colors.white30,
-                          ),
-                        ),
-                      ),
-                    ),
+                    child: _buildHeroImage(landmarkId, parentId),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -218,6 +206,37 @@ class DetailScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHeroImage(String landmarkId, String? parentId) {
+    return Image.asset(
+      'assets/hero_images/$landmarkId.jpg',
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        if (parentId != null && parentId.isNotEmpty && parentId != landmarkId) {
+          return Image.asset(
+            'assets/hero_images/$parentId.jpg',
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                _buildHeroPlaceholder(56),
+          );
+        }
+        return _buildHeroPlaceholder(56);
+      },
+    );
+  }
+
+  Widget _buildHeroPlaceholder(double iconSize) {
+    return Container(
+      color: Colors.grey[850],
+      child: Center(
+        child: Icon(
+          Icons.image_outlined,
+          size: iconSize,
+          color: Colors.white30,
+        ),
       ),
     );
   }

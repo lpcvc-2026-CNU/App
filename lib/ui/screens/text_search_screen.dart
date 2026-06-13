@@ -194,7 +194,12 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
         }
 
         final data = snapshot.data ?? {};
-        final name = data['name'] ?? landmarkId;
+        final rawName = (data['name'] ?? landmarkId).toString();
+        final parentName = data['parent_name'] as String?;
+        final parentId = data['parent_landmark_id'] as String?;
+        final name = (parentName != null && parentName.isNotEmpty)
+            ? '$parentName · $rawName'
+            : rawName;
         final desc = data['description'] ?? '';
 
         return GestureDetector(
@@ -218,16 +223,8 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
                     child: Image.asset(
                       'assets/hero_images/$landmarkId.jpg',
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[850],
-                        child: const Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            size: 50,
-                            color: Colors.white30,
-                          ),
-                        ),
-                      ),
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildHeroFallback(parentId, landmarkId),
                     ),
                   ),
                 ),
@@ -291,6 +288,30 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
               style: const TextStyle(color: Colors.white54, fontSize: 15),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroFallback(String? parentId, String landmarkId) {
+    if (parentId != null && parentId.isNotEmpty && parentId != landmarkId) {
+      return Image.asset(
+        'assets/hero_images/$parentId.jpg',
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildHeroPlaceholder(),
+      );
+    }
+    return _buildHeroPlaceholder();
+  }
+
+  Widget _buildHeroPlaceholder() {
+    return Container(
+      color: Colors.grey[850],
+      child: const Center(
+        child: Icon(
+          Icons.image_outlined,
+          size: 50,
+          color: Colors.white30,
         ),
       ),
     );

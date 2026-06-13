@@ -2,6 +2,7 @@
   "items": [
     {
       "landmark_id": "gyeongbokgung_geunjeongmun",
+      "parent_landmark_id": "gyeongbokgung",
       "name_ko": "경복궁 근정문",
       "name_en": "Gyeongbokgung Geunjeongmun",
       "name_zh": "景福宫 勤政门",
@@ -85,6 +86,20 @@
       "aliases": ["청와대", "블루하우스", "대통령 관저"]
     },
     {
+      "landmark_id": "gyeongbokgung",
+      "name_ko": "경복궁",
+      "name_en": "Gyeongbokgung Palace",
+      "name_zh": "景福宫",
+      "name_ja": "景福宮",
+      "description_ko": "조선 왕조의 법궁으로, 광화문과 근정문, 근정전 등 여러 주요 전각과 문을 포함하는 대표 궁궐입니다.",
+      "description_en": "Gyeongbokgung Palace is the main royal palace of the Joseon Dynasty, grouping major gates and halls such as Gwanghwamun, Geunjeongmun, and Geunjeongjeon.",
+      "description_zh": "景福宫是朝鲜王朝的正宫，包含光化门、勤政门、勤政殿等主要宫门与殿阁。",
+      "description_ja": "景福宮は朝鮮王朝の正宮であり、光化門、勤政門、勤政殿など主要な門と殿閣を含む代表的な宮殿です。",
+      "latitude": 37.5796,
+      "longitude": 126.9770,
+      "aliases": ["경복궁", "조선 왕궁", "Gyeongbokgung Palace"]
+    },
+    {
       "landmark_id": "deoksugung",
       "name_ko": "덕수궁",
       "name_en": "Deoksugung",
@@ -100,6 +115,7 @@
     },
     {
       "landmark_id": "gwanghwamun",
+      "parent_landmark_id": "gyeongbokgung",
       "name_ko": "광화문",
       "name_en": "Gwanghwamun",
       "name_zh": "光化门",
@@ -319,7 +335,7 @@
     },
     {
       "landmark_id": "gyeongbokgung_geunjeongjeon",
-      "parent_landmark_id": "gyeongbokgung_geunjeongmun",
+      "parent_landmark_id": "gyeongbokgung",
       "name_ko": "경복궁 근정전",
       "name_en": "Gyeongbokgung Geunjeongjeon",
       "name_zh": "景福宫 勤政殿",
