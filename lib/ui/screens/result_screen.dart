@@ -324,6 +324,7 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
         // API 레벨에서 바인딩된 name 및 description 공통 다국어 프로퍼티 사용
         final rawName = (data['name'] ?? landmarkId).toString();
         final parentName = data['parent_name'] as String?;
+        final parentId = data['parent_landmark_id'] as String?;
         final name = (parentName != null && parentName.isNotEmpty)
             ? '$parentName · $rawName'
             : rawName;
@@ -349,22 +350,9 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
                       ),
                       child: AspectRatio(
                         aspectRatio: 16 / 10,
-                        child: Image.asset(
-                          'assets/hero_images/$landmarkId.jpg',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: Colors.grey[850],
-                            child: const Center(
-                              child: Icon(
-                                Icons.image_outlined,
-                                size: 50,
-                                color: Colors.white30,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        child: _buildHeroImage(landmarkId, parentId),
                       ),
+                    ),
                     Positioned(
                       top: 14,
                       right: 14,
@@ -421,6 +409,37 @@ class _ResultScreenState extends State<ResultScreen> with SingleTickerProviderSt
           ),
         );
       },
+    );
+  }
+
+  Widget _buildHeroImage(String landmarkId, String? parentId) {
+    return Image.asset(
+      'assets/hero_images/$landmarkId.jpg',
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        if (parentId != null && parentId.isNotEmpty && parentId != landmarkId) {
+          return Image.asset(
+            'assets/hero_images/$parentId.jpg',
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+                _buildHeroPlaceholder(50),
+          );
+        }
+        return _buildHeroPlaceholder(50);
+      },
+    );
+  }
+
+  Widget _buildHeroPlaceholder(double iconSize) {
+    return Container(
+      color: Colors.grey[850],
+      child: Center(
+        child: Icon(
+          Icons.image_outlined,
+          size: iconSize,
+          color: Colors.white30,
+        ),
+      ),
     );
   }
 

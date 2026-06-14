@@ -1,0 +1,629 @@
+{
+  "query_count": 184,
+  "supervised_query_count": 179,
+  "out_of_scope_query_count": 5,
+  "top1_accuracy": 0.9888268156424581,
+  "top3_recall": 1.0,
+  "out_of_scope_accuracy": 1.0,
+  "policy": {
+    "score_type": "semantic_text_fusion",
+    "semantic_weight": 0.75,
+    "keyword_weight": 0.25,
+    "matched_threshold": 0.45,
+    "ambiguous_margin": 0.08,
+    "out_of_scope_threshold": 0.25,
+    "no_keyword_oos_margin": 0.05,
+    "no_keyword_match_threshold": 0.6
+  },
+  "by_language": {
+    "en": {
+      "count": 54,
+      "top1_accuracy": 1.0,
+      "top3_recall": 1.0
+    },
+    "ko": {
+      "count": 125,
+      "top1_accuracy": 0.984,
+      "top3_recall": 1.0
+    }
+  },
+  "by_query_type": {
+    "alias": {
+      "count": 75,
+      "top1_accuracy": 0.9733333333333334,
+      "top3_recall": 1.0
+    },
+    "description": {
+      "count": 52,
+      "top1_accuracy": 1.0,
+      "top3_recall": 1.0
+    },
+    "official_name": {
+      "count": 52,
+      "top1_accuracy": 1.0,
+      "top3_recall": 1.0
+    }
+  },
+  "failure_cases": [
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_alias_000",
+      "query": "경복궁",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard",
+      "decision_status": "ambiguous",
+      "reason_codes": [
+        "text_margin_low"
+      ],
+      "margin": 0.012499999999999956,
+      "top3": [
+        {
+          "landmark_id": "gyeongbokgung",
+          "parent_landmark_id": null,
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 1.0,
+          "final_text_score": 1.0000000894069672,
+          "matched_text": "경복궁",
+          "text_type": "official_name",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gyeongbokgung_geunjeongmun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "deoksugung",
+          "parent_landmark_id": null,
+          "semantic_score": 0.9520812034606934,
+          "keyword_score": 0.0,
+          "final_text_score": 0.71406090259552,
+          "matched_text": "경운궁",
+          "text_type": "alias",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "query_id": "gwanghwamun_alias_001",
+      "query": "경복궁 정문",
+      "expected_landmark_id": "gwanghwamun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard",
+      "decision_status": "ambiguous",
+      "reason_codes": [
+        "text_margin_low"
+      ],
+      "margin": 0.0,
+      "top3": [
+        {
+          "landmark_id": "gyeongbokgung_geunjeongmun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁 정문",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gwanghwamun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁 정문",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gyeongbokgung",
+          "parent_landmark_id": null,
+          "semantic_score": 0.5137840509414673,
+          "keyword_score": 0.6,
+          "final_text_score": 0.5353380382061005,
+          "matched_text": "경복궁",
+          "text_type": "official_name",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": false,
+      "top3_correct": true
+    }
+  ],
+  "out_of_scope_cases": [
+    {
+      "query_id": "oos_000",
+      "query": "에펠탑",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope",
+      "decision_status": "out_of_scope",
+      "reason_codes": [
+        "no_keyword_and_score_below_match"
+      ],
+      "margin": 0.020980149507522583,
+      "top3": [
+        {
+          "landmark_id": "bohyunsanshingak",
+          "parent_landmark_id": null,
+          "semantic_score": 0.5636491775512695,
+          "keyword_score": 0.0,
+          "final_text_score": 0.42273688316345215,
+          "matched_text": "신각",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "cheonggyecheon",
+          "parent_landmark_id": null,
+          "semantic_score": 0.5356756448745728,
+          "keyword_score": 0.0,
+          "final_text_score": 0.40175673365592957,
+          "matched_text": "청계광장",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "changgyeonggung",
+          "parent_landmark_id": null,
+          "semantic_score": 0.4686580002307892,
+          "keyword_score": 0.0,
+          "final_text_score": 0.3514935001730919,
+          "matched_text": "동궐",
+          "text_type": "alias",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": false,
+      "top3_correct": false
+    },
+    {
+      "query_id": "oos_001",
+      "query": "부산 바다",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope",
+      "decision_status": "out_of_scope",
+      "reason_codes": [
+        "no_keyword_and_score_below_match"
+      ],
+      "margin": 0.10737593472003937,
+      "top3": [
+        {
+          "landmark_id": "bohyunsanshingak",
+          "parent_landmark_id": null,
+          "semantic_score": 0.773137092590332,
+          "keyword_score": 0.0,
+          "final_text_score": 0.579852819442749,
+          "matched_text": "산신각",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "naksan_park",
+          "parent_landmark_id": null,
+          "semantic_score": 0.6299691796302795,
+          "keyword_score": 0.0,
+          "final_text_score": 0.47247688472270966,
+          "matched_text": "낙산 성곽길",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "jogyesa",
+          "parent_landmark_id": null,
+          "semantic_score": 0.580986499786377,
+          "keyword_score": 0.0,
+          "final_text_score": 0.4357398748397827,
+          "matched_text": "조계종 총본산",
+          "text_type": "alias",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": false,
+      "top3_correct": false
+    },
+    {
+      "query_id": "oos_002",
+      "query": "맛집 추천",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope",
+      "decision_status": "out_of_scope",
+      "reason_codes": [
+        "no_keyword_and_score_below_match"
+      ],
+      "margin": 0.023262418806552887,
+      "top3": [
+        {
+          "landmark_id": "cheongwadae",
+          "parent_landmark_id": null,
+          "semantic_score": 0.498558908700943,
+          "keyword_score": 0.0,
+          "final_text_score": 0.37391918152570724,
+          "matched_text": "블루하우스",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "bohyunsanshingak",
+          "parent_landmark_id": null,
+          "semantic_score": 0.4675423502922058,
+          "keyword_score": 0.0,
+          "final_text_score": 0.35065676271915436,
+          "matched_text": "산신각",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "cheonggyecheon",
+          "parent_landmark_id": null,
+          "semantic_score": 0.3716757297515869,
+          "keyword_score": 0.0,
+          "final_text_score": 0.2787567973136902,
+          "matched_text": "광화문 청계천",
+          "text_type": "alias",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": false,
+      "top3_correct": false
+    },
+    {
+      "query_id": "oos_003",
+      "query": "Eiffel Tower",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope",
+      "decision_status": "out_of_scope",
+      "reason_codes": [
+        "no_keyword_and_score_below_match"
+      ],
+      "margin": 0.03715802729129791,
+      "top3": [
+        {
+          "landmark_id": "n_seoul_tower",
+          "parent_landmark_id": null,
+          "semantic_score": 0.5846521854400635,
+          "keyword_score": 0.0,
+          "final_text_score": 0.4384891390800476,
+          "matched_text": "서울타워",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "bohyunsanshingak",
+          "parent_landmark_id": null,
+          "semantic_score": 0.5351081490516663,
+          "keyword_score": 0.0,
+          "final_text_score": 0.4013311117887497,
+          "matched_text": "신각",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "cheongwadae",
+          "parent_landmark_id": null,
+          "semantic_score": 0.5102444291114807,
+          "keyword_score": 0.0,
+          "final_text_score": 0.38268332183361053,
+          "matched_text": "블루하우스",
+          "text_type": "alias",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": false,
+      "top3_correct": false
+    },
+    {
+      "query_id": "oos_004",
+      "query": "beach restaurant",
+      "expected_landmark_id": null,
+      "expected_parent_landmark_id": null,
+      "language": "en",
+      "query_type": "out_of_scope",
+      "difficulty": "out_of_scope",
+      "decision_status": "out_of_scope",
+      "reason_codes": [
+        "no_keyword_and_score_below_match"
+      ],
+      "margin": 0.11475710570812225,
+      "top3": [
+        {
+          "landmark_id": "bohyunsanshingak",
+          "parent_landmark_id": null,
+          "semantic_score": 0.6230083703994751,
+          "keyword_score": 0.0,
+          "final_text_score": 0.4672562777996063,
+          "matched_text": "신각",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "cheonggyecheon",
+          "parent_landmark_id": null,
+          "semantic_score": 0.46999889612197876,
+          "keyword_score": 0.0,
+          "final_text_score": 0.35249917209148407,
+          "matched_text": "청계광장",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "cheongwadae",
+          "parent_landmark_id": null,
+          "semantic_score": 0.44143661856651306,
+          "keyword_score": 0.0,
+          "final_text_score": 0.3310774639248848,
+          "matched_text": "블루하우스",
+          "text_type": "alias",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": false,
+      "top3_correct": false
+    }
+  ],
+  "low_margin_cases": [
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_alias_000",
+      "query": "경복궁",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard",
+      "decision_status": "ambiguous",
+      "reason_codes": [
+        "text_margin_low"
+      ],
+      "margin": 0.012499999999999956,
+      "top3": [
+        {
+          "landmark_id": "gyeongbokgung",
+          "parent_landmark_id": null,
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 1.0,
+          "final_text_score": 1.0000000894069672,
+          "matched_text": "경복궁",
+          "text_type": "official_name",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gyeongbokgung_geunjeongmun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "deoksugung",
+          "parent_landmark_id": null,
+          "semantic_score": 0.9520812034606934,
+          "keyword_score": 0.0,
+          "final_text_score": 0.71406090259552,
+          "matched_text": "경운궁",
+          "text_type": "alias",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": false,
+      "top3_correct": true
+    },
+    {
+      "query_id": "gyeongbokgung_geunjeongmun_alias_003",
+      "query": "경복궁 정문",
+      "expected_landmark_id": "gyeongbokgung_geunjeongmun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard",
+      "decision_status": "ambiguous",
+      "reason_codes": [
+        "text_margin_low"
+      ],
+      "margin": 0.0,
+      "top3": [
+        {
+          "landmark_id": "gyeongbokgung_geunjeongmun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁 정문",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gwanghwamun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁 정문",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gyeongbokgung",
+          "parent_landmark_id": null,
+          "semantic_score": 0.5137840509414673,
+          "keyword_score": 0.6,
+          "final_text_score": 0.5353380382061005,
+          "matched_text": "경복궁",
+          "text_type": "official_name",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "query_id": "gyeongbokgung_name_ko",
+      "query": "경복궁",
+      "expected_landmark_id": "gyeongbokgung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "official_name",
+      "difficulty": "standard",
+      "decision_status": "ambiguous",
+      "reason_codes": [
+        "text_margin_low"
+      ],
+      "margin": 0.012499999999999956,
+      "top3": [
+        {
+          "landmark_id": "gyeongbokgung",
+          "parent_landmark_id": null,
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 1.0,
+          "final_text_score": 1.0000000894069672,
+          "matched_text": "경복궁",
+          "text_type": "official_name",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gyeongbokgung_geunjeongmun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "deoksugung",
+          "parent_landmark_id": null,
+          "semantic_score": 0.9520812034606934,
+          "keyword_score": 0.0,
+          "final_text_score": 0.71406090259552,
+          "matched_text": "경운궁",
+          "text_type": "alias",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "query_id": "gyeongbokgung_alias_000",
+      "query": "경복궁",
+      "expected_landmark_id": "gyeongbokgung",
+      "expected_parent_landmark_id": null,
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard",
+      "decision_status": "ambiguous",
+      "reason_codes": [
+        "text_margin_low"
+      ],
+      "margin": 0.012499999999999956,
+      "top3": [
+        {
+          "landmark_id": "gyeongbokgung",
+          "parent_landmark_id": null,
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 1.0,
+          "final_text_score": 1.0000000894069672,
+          "matched_text": "경복궁",
+          "text_type": "official_name",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gyeongbokgung_geunjeongmun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "deoksugung",
+          "parent_landmark_id": null,
+          "semantic_score": 0.9520812034606934,
+          "keyword_score": 0.0,
+          "final_text_score": 0.71406090259552,
+          "matched_text": "경운궁",
+          "text_type": "alias",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": true,
+      "top3_correct": true
+    },
+    {
+      "query_id": "gwanghwamun_alias_001",
+      "query": "경복궁 정문",
+      "expected_landmark_id": "gwanghwamun",
+      "expected_parent_landmark_id": "gyeongbokgung",
+      "language": "ko",
+      "query_type": "alias",
+      "difficulty": "standard",
+      "decision_status": "ambiguous",
+      "reason_codes": [
+        "text_margin_low"
+      ],
+      "margin": 0.0,
+      "top3": [
+        {
+          "landmark_id": "gyeongbokgung_geunjeongmun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁 정문",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gwanghwamun",
+          "parent_landmark_id": "gyeongbokgung",
+          "semantic_score": 1.0000001192092896,
+          "keyword_score": 0.95,
+          "final_text_score": 0.9875000894069672,
+          "matched_text": "경복궁 정문",
+          "text_type": "alias",
+          "language": "ko"
+        },
+        {
+          "landmark_id": "gyeongbokgung",
+          "parent_landmark_id": null,
+          "semantic_score": 0.5137840509414673,
+          "keyword_score": 0.6,
+          "final_text_score": 0.5353380382061005,
+          "matched_text": "경복궁",
+          "text_type": "official_name",
+          "language": "ko"
+        }
+      ],
+      "top1_correct": false,
+      "top3_correct": true
+    }
+  ]
+}

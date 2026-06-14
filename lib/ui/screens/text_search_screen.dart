@@ -118,7 +118,8 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
                   style: const TextStyle(color: Colors.white),
                   textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
-                    hintText: AppTranslations.translate('text_search_input_hint', lang),
+                    hintText: AppTranslations.translate(
+                        'text_search_input_hint', lang),
                     hintStyle: const TextStyle(color: Colors.white38),
                     prefixIcon: const Icon(Icons.search, color: Colors.white54),
                     border: InputBorder.none,
@@ -175,12 +176,18 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        ...topList.map((item) => _buildLandmarkCard(item['landmark_id'])),
+        ...topList.map(
+          (item) => _buildLandmarkCard(Map<String, dynamic>.from(item as Map)),
+        ),
       ],
     );
   }
 
-  Widget _buildLandmarkCard(String landmarkId) {
+  Widget _buildLandmarkCard(Map<String, dynamic> candidate) {
+    final landmarkId = candidate['landmark_id'].toString();
+    final displayScore = (candidate['display_score'] as num?)?.toInt() ?? 0;
+    final scoreType = candidate['score_type']?.toString() ?? 'keyword_match';
+    final matchedText = candidate['matched_text']?.toString();
     return FutureBuilder<Map<String, dynamic>>(
       future: widget.apiClient.getLandmarkDetails(landmarkId),
       builder: (context, snapshot) {
@@ -194,7 +201,12 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
         }
 
         final data = snapshot.data ?? {};
-        final name = data['name'] ?? landmarkId;
+        final rawName = (data['name'] ?? landmarkId).toString();
+        final parentName = data['parent_name'] as String?;
+        final parentId = data['parent_landmark_id'] as String?;
+        final name = (parentName != null && parentName.isNotEmpty)
+            ? '$parentName · $rawName'
+            : rawName;
         final desc = data['description'] ?? '';
 
         return GestureDetector(
@@ -218,16 +230,8 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
                     child: Image.asset(
                       'assets/hero_images/$landmarkId.jpg',
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[850],
-                        child: const Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            size: 50,
-                            color: Colors.white30,
-                          ),
-                        ),
-                      ),
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildHeroFallback(parentId, landmarkId),
                     ),
                   ),
                 ),
@@ -236,12 +240,45 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              name.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE61E2B)
+                                  .withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              '$displayScore',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
                       Text(
-                        name.toString(),
+                        scoreType,
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                          color: Colors.white54,
+                          fontSize: 12,
                         ),
                       ),
                       if (desc.toString().isNotEmpty) ...[
@@ -253,6 +290,19 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
                           style: const TextStyle(
                             color: Colors.white70,
                             height: 1.5,
+                          ),
+                        ),
+                      ],
+                      if (matchedText != null && matchedText.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          matchedText,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 13,
+                            height: 1.4,
                           ),
                         ),
                       ],
@@ -291,6 +341,30 @@ class _TextSearchScreenState extends State<TextSearchScreen> {
               style: const TextStyle(color: Colors.white54, fontSize: 15),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroFallback(String? parentId, String landmarkId) {
+    if (parentId != null && parentId.isNotEmpty && parentId != landmarkId) {
+      return Image.asset(
+        'assets/hero_images/$parentId.jpg',
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildHeroPlaceholder(),
+      );
+    }
+    return _buildHeroPlaceholder();
+  }
+
+  Widget _buildHeroPlaceholder() {
+    return Container(
+      color: Colors.grey[850],
+      child: const Center(
+        child: Icon(
+          Icons.image_outlined,
+          size: 50,
+          color: Colors.white30,
         ),
       ),
     );
