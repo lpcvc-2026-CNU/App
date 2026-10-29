@@ -2,7 +2,7 @@
 
 사진이나 텍스트로 서울의 랜드마크를 찾고, 다국어 설명을 확인하는 Flutter 앱입니다. MobileCLIP2 이미지·텍스트 인코더를 ONNX Runtime으로 기기 안에서 실행하며, 계정·건의·알림 기능은 FastAPI 백엔드와 연결합니다.
 
-[모델 실험 저장소](https://github.com/HyunKN/ondevice-landmark-assistant) · [실험 결과](https://landmark-assistant-sprint1.vercel.app/experiments/paper/sprint2-main-matrix-results-2026-06-15.html) · [기술 문서](https://landmark-assistant-sprint1.vercel.app/) · [MIT License](#license)
+[모델 실험 저장소](https://github.com/HyunKN/ondevice-landmark-assistant) · [실험 결과](https://landmark-assistant-sprint1.vercel.app/experiments/paper/sprint2-main-matrix-results-2026-06-15.html) · [기술 문서](https://landmark-assistant-sprint1.vercel.app/) · [MIT License](LICENSE)
 
 ## 두 저장소의 역할
 
@@ -227,28 +227,4 @@ Python 모델 검사는 별도로 받은 ONNX·외부 가중치 파일이 있어
 
 ## 라이선스
 
-프로젝트에서 작성한 소스 코드와 문서는 **MIT License**로 제공합니다. 외부 라이브러리, 사전학습 모델·가중치, 데이터셋과 이미지 등 제3자 자료는 각 원저작자의 라이선스와 이용 조건을 따릅니다.
-
-```text
-MIT License
-
-Copyright (c) 2026 lpcvc-2026-CNU contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+프로젝트에서 작성한 소스 코드와 문서는 **[MIT License](LICENSE)**로 제공합니다. 외부 라이브러리, 사전학습 모델·가중치, 데이터셋과 이미지 등 제3자 자료는 각 원저작자의 라이선스와 이용 조건을 따릅니다.
