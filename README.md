@@ -1,124 +1,230 @@
 # Seoul Landmark Assistant
 
-서울 랜드마크 이미지 인식 및 상세 정보 조회를 제공하는 다국어 하이브리드 어플리케이션 프로젝트입니다. ONNX Runtime 기반의 디바이스 내 추론 기능 및 회원 가입/인증, 실시간 푸시 알림 인프라를 지원합니다.
+사진이나 텍스트로 서울의 랜드마크를 찾고, 다국어 설명을 확인하는 Flutter 앱입니다. MobileCLIP2 이미지·텍스트 인코더를 ONNX Runtime으로 기기 안에서 실행하며, 계정·건의·알림 기능은 FastAPI 백엔드와 연결합니다.
 
----
+[모델 실험 저장소](https://github.com/HyunKN/ondevice-landmark-assistant) · [실험 결과](https://landmark-assistant-sprint1.vercel.app/experiments/paper/sprint2-main-matrix-results-2026-06-15.html) · [기술 문서](https://landmark-assistant-sprint1.vercel.app/) · [MIT License](LICENSE)
 
-## 🚀 2026.06.10 업데이트: FCM 푸시 알림 인프라 구축 및 연동
+## 두 저장소의 역할
 
-### 1. 백엔드 (FastAPI) 변경 사항
-- **FCM 푸시 발송 인프라 통합**: `firebase-admin` 라이브러리를 추가하고, `firebase-service-account.json` 자격 증명서 파일이 백엔드 폴더 내에 존재할 경우 자동으로 FCM Admin SDK를 초기화하도록 설계했습니다.
-- **Mock/Sandbox 모드 지원**: 로컬 개발 환경 및 Firebase 콘솔 설정이 완료되기 전에도 백엔드가 정상 기동하도록 안전 예외 처리(Try-Catch) 및 Mock 푸시 로그 출력 모드를 도입했습니다.
-- **푸시 발송 테스트용 API 구현**: `POST /api/notifications/send` 엔드포인트를 구현하여 수신자의 `push_token` 혹은 가입 이메일을 바탕으로 실시간 푸시 알림을 즉시 발송하고 결과를 검증할 수 있습니다.
-- **1기기 1계정 정책 강화**: 회원가입(`POST /api/auth/register`) 및 로그인(`POST /api/auth/login`) 요청 시 전달받은 `push_token`을 고유 기기 식별자로 삼아, 타 유저가 점유하고 있던 토큰을 자동으로 무효화(`None` 처리)합니다.
-- **백엔드 파일 복구 및 핫픽스**: 기존에 깨져있던 Python 백엔드 코어 소스코드들(`models.py`, `schemas.py`, `security.py`, `auth.py`, `migrate_landmarks.py`)을 복구했으며, 추가적으로 `landmarks.py` 모듈이 문자열 형태로 인코딩되어 uvicorn 구동 시 발생하던 `AttributeError` 버그를 핫픽스(실제 코드로 복구) 완료했습니다.
+| 저장소 | 담당 범위 |
+| --- | --- |
+| **[lpcvc-2026-CNU/App](https://github.com/lpcvc-2026-CNU/App)** | 실제 앱 개발, 선정된 모델 연동, 사용자 기능, Android 빌드와 배포 |
+| **[HyunKN/ondevice-landmark-assistant](https://github.com/HyunKN/ondevice-landmark-assistant)** | 모델 실험·비교·선정 근거, 학습·평가 코드, 모델과 앱의 연동 기록 |
 
-### 2. 클라이언트 (Flutter App) 변경 사항
-- **Firebase 패키지 의존성 추가**: `firebase_core` 및 `firebase_messaging` 모듈을 연동했습니다.
-- **푸시 서비스 추상화 (`PushNotificationService`)**: 포그라운드/백그라운드 메시지 수신, 토큰 갱신 리스너 등록, iOS용 APNS 토큰 대기 등의 공통 인터페이스를 제공하는 싱글톤 서비스를 추가했습니다. 백엔드와 마찬가지로 Firebase 설정 파일 누락 시 자동으로 가상 디버그 토큰을 발급하는 Sandbox 모드를 탑재했습니다.
-- **포그라운드 알림 사용자 인터페이싱**: 앱이 활성화된 포그라운드 상태에서 백엔드나 FCM으로부터 메시지를 받았을 때, 화면 하단에 알림 메시지를 담은 `SnackBar`가 즉시 표시되도록 `home_screen.dart` 초기화 로직을 업데이트했습니다.
-- **호환성 보정**: 현 타겟 SDK 환경에서 정의되지 않은 `Color.withValues` 메서드를 안전하고 하위 호환성을 가진 `Color.withOpacity` 메서드로 일괄 리팩토링하여 빌드 에러를 방지했습니다.
-- **Gradle 빌드 및 SDK/NDK 호환성 확보**:
-  - 프로젝트 수준 `settings.gradle.kts`와 앱 수준 `build.gradle.kts`에 `com.google.gms.google-services` 플러그인을 정상 적용하여 Firebase 연동을 완료했습니다.
-  - 최신 Firebase 라이브러리 연동 규격에 맞추어 `compileSdk` 버전을 `35`로, `ndkVersion`을 `"27.0.12077973"`으로 최적화했습니다.
-  - 에뮬레이터 디버깅 지원을 위해 `abiFilters`에 `"x86_64"`를 추가하고 중복 항목을 정리했습니다.
+모델 실험에서 결정한 ONNX 모델과 전처리·클래스·검색 정책을 App에 전달하고, App에서는 실제 입력부터 화면 표시까지의 동작을 검증합니다. 실험 정확도와 앱의 기기별 속도·안정성은 각각 확인해야 합니다.
 
----
+## 주요 기능
 
-## 🚀 2026.06.13 업데이트: Sprint 2 최종 마일스톤 통합 (온디바이스 AI 모델 및 로깅/전처리 고도화)
+| 기능 | 처리 위치와 동작 |
+| --- | --- |
+| 사진 검색 | 카메라·갤러리 이미지의 품질을 검사하고, 모델 임베딩과 랜드마크 대표 벡터를 비교해 상위 후보를 반환 |
+| 텍스트 검색 | 텍스트 임베딩의 의미 유사도와 로컬 DB의 키워드 점수를 결합해 후보를 정렬 |
+| 결과·상세 정보 | 후보, 유사도, 판정 상태를 표시하고 한국어·영어·중국어·일본어 설명과 상위 랜드마크 정보를 조회 |
+| 계정 | 서버의 회원가입·로그인·탈퇴 API와 연결하고, 인증 토큰은 기기의 보안 저장소에 보관 |
+| 건의·알림 | 사용자 건의, 관리자 승인·반려, 알림함, Firebase Cloud Messaging 연동 |
+| 검색 기록 | 로컬 SQLite에 기록하고, 서버에도 비동기로 전송 시도 |
 
-### 1. 온디바이스 AI 최신 모델 및 DB 마이그레이션 (P0)
-- **MobileCLIP2-S3 FP16 연동**: `assets/mobile_artifacts_fp16/` 경로를 신설하고 이미지/텍스트 인코더 모델 파일들(`.onnx`, `.onnx.data`, `manifest.json`, `prototype_index.json` 등)을 완벽하게 배치했습니다.
-- **Android 네이티브 에셋 동적 캐싱**: `MainActivity.kt`에서 `manifest.json`을 파싱하여 동적으로 기기 내부 경로로 모델들을 복사하도록 수정했으며, 파일 크기를 대조하여 모델 업데이트 시 강제 덮어쓰기 캐시 갱신 기능을 탑재했습니다.
-- **23-Class 팩트체크 및 데이터 갱신**: classes.json 기준 23개 ID를 검증하고, 이에 맞춰 창경궁/덕수궁 세부 전각 등 12종의 세부 데이터를 보강해 총 25종의 마스터 카탈로그 데이터셋 구축 및 sqlite DB 마이그레이션을 완료했습니다.
+**검색 추론은 로컬에서 처리하지만 앱의 모든 기능이 오프라인인 것은 아닙니다.** 홈 화면은 로그인 상태에 따라 열리며, 최초 회원가입·로그인과 건의·알림 기능은 백엔드가 필요합니다. 검색 기록의 서버 전송 실패는 검색 결과 반환을 막지 않습니다.
 
-### 2. 스코어 이원화 및 UI/UX 개정 (P1)
-- **텍스트 검색 분리**: 키워드(LIKE) 검색과 향후 연동할 Semantic 검색을 분리하여 `score_type: "keyword_match"` 형태로 스코어 포맷을 명확히 이원화하여 반환하도록 설계했습니다.
-- **유사도 점수 개정**: 정답 확률(%) 오인을 방지하기 위해 다국어 번역 리소스에 `'similarity'`를 신설하고, UI 상의 점수 표기를 **'유사도 75'** 형태로 정수화 표출을 시정했습니다.
-- **부모·자식 연동 및 상위 타이틀 결합 표출**: `parent_landmark_id`를 조인하여 **'덕수궁 · 대한문'** 형태로 부모 랜드마크와 세부 전각명이 자연스럽게 결합되어 노출되도록 검색 결과 및 상세 정보 뷰를 고도화했습니다.
+## 아키텍처
 
-### 3. 운영 및 디버깅 품질 향상 (P2)
-- **검색 로깅 정보 대폭 확장 (SQLite & 서버 DB)**:
-  - 로컬 SQLite DB 스키마 버전 5 승격: `search_logs` 테이블에 `model_version`, `backend`, `top3_scores`, `margin`, `decision_status`, `latency_ms` 필드를 추가했습니다.
-  - 서버 DB DDL 및 API 구축: SQLAlchemy `SearchLog` 모델 설계 및 Pydantic 스키마 정의, `POST /api/search/logs` API 추가로 서버 측 DB에도 검색 로그 히스토리가 연동 적재되도록 하였습니다.
-  - 모바일 로깅 이원화: 로컬 SQLite 저장과 백엔드 서버 로깅 API 전송(백그라운드 비동기)을 이원화 처리했습니다.
-- **전처리 상수 동적 파싱**: `mean`, `std`, `image_size` 상수를 하드코딩 `static const` 대신 에셋 내 `preprocessing.json` 파일에서 로딩 시점에 동적으로 파싱 및 적용되도록 코드를 전면 개편했습니다.
-- **앱 시작 시 모델 사양 정합성 검증 및 개발자 경고 알림 탑재**: 
-  - 앱 최초 구동 시 백그라운드로 `manifest.json` 사양(ID, 정밀도, 클래스 수)을 기대 사양과 대조하여 `modelSpecWarning` 경고를 식별합니다.
-  - 스펙 Mismatch가 감지되면 `HomeScreen` 최초 진입 시 개발자에게 **AlertDialog 경고 팝업**을 즉각 노출해 주는 강력한 안전 장치를 연동하였습니다.
-- **정적 컴파일 검증**: `analysis_options.yaml`에서 emulate 폴더를 격리하여 빌드와 무관한 외부 에러들을 배제하고 linter 경고를 클리어하여 `flutter analyze` 100% 무결 통과를 확보했습니다.
+```mermaid
+flowchart TB
+    subgraph device["Android 기기"]
+        UI["Flutter 화면"]
+        Local["LocalApiClientImpl<br/>검색·판정·결과 조합"]
+        Inference["ONNX Runtime<br/>이미지·텍스트 인코더"]
+        DB[("로컬 SQLite<br/>랜드마크·별칭·검색 기록")]
+        Online["인증·기능별 Repository<br/>BackendClient"]
 
----
+        UI -->|"사진·텍스트 검색"| Local
+        Local --> Inference
+        Local --> DB
+        UI -->|"계정·건의·알림함"| Online
+    end
 
+    subgraph server["백엔드"]
+        API["FastAPI"]
+        ServerDB[("서버 DB<br/>SQLAlchemy")]
+        FCM["Firebase Cloud Messaging<br/>기기로 푸시 전송"]
+        API --> ServerDB
+        API --> FCM
+    end
 
-## 🚀 2026.06.12 업데이트: 건의 상태 변경 알림 트리거 및 앱 내 알림함 API 구축
+    Online -->|"HTTP API"| API
+    Local -.->|"검색 기록 비동기 전송"| API
+```
 
-### 1. 백엔드 (FastAPI) 변경 사항
-- **실시간 알림 발송 로직 연동**: 관리자 권한으로 건의 상태가 변경(`approved` 또는 `rejected`)되는 순간, 해당 유저의 디바이스 토큰(`push_token`)을 조회하여 실시간 FCM 푸시 알림을 즉시 발송합니다.
-- **알림 내역 데이터베이스 테이블 (`Notification`)**: 알림 이력을 기록 및 저장할 수 있도록 `Notification` 테이블을 설계하고 추가했습니다. (유저 탈퇴 시 연동된 알림 데이터는 cascade delete 처리)
-- **앱 내 알림함 API**:
-  - `GET /api/notifications`: 로그인한 사용자의 모든 알림 목록을 최신순으로 조회합니다.
-  - `PATCH /api/notifications/{notification_id}/read`: 본인이 수신한 특정 알림을 읽음(`is_read = true`) 처리합니다.
-- **통합 시나리오 검증 성공**: FastAPI `TestClient` 기반 통합 시나리오 테스트(로그인 -> 건의 제출 -> 관리자 승인 -> 알림 DB 생성 확인 -> 알림 조회 API 및 읽음 처리 상태 갱신 API 호출)를 전 단계 모두 성공적으로 완료했습니다.
+[lib/main.dart](lib/main.dart)에서 DB, 추론 서비스, 검색 클라이언트, 인증 컨트롤러와 기능별 Repository를 연결합니다. [AuthGuard](lib/auth/auth_guard.dart)가 로그인 화면과 홈 화면을 선택합니다.
 
----
+### 사진 검색: 입력 → 추론 → 후보 → 상세 화면
 
-## 🛠️ 팀원 연동 및 로컬 테스트 가이드
+1. 사용자가 사진을 선택하면 [LocalApiClientImpl.search](lib/api/local_api_client_impl.dart)가 [ImageQualityService](lib/services/image_quality_service.dart)로 크기·밝기·대비·선명도를 확인합니다. 품질 기준을 통과하지 못하면 `low_quality`를 반환합니다.
+2. [OnnxInferenceService](lib/services/onnx_inference_service.dart)가 RGB 변환, 크기 조정, 중앙 자르기, 정규화를 수행합니다. 현재 입력은 `[1, 3, 224, 224]` Float32이며, 이미지 인코더 출력은 L2 정규화한 512차원 벡터입니다.
+3. `prototype_index.json`의 랜드마크 대표 벡터와 코사인 유사도를 계산해 상위 3개 후보를 선택합니다. 최고 점수와 1·2위 점수 차이를 `confidence_policy.json` 기준에 대조합니다.
+4. 검색 메서드는 `top3`, `decision`, `reason_codes`, `latency_ms`를 담은 Dart Map을 반환합니다. [결과 화면](lib/ui/screens/result_screen.dart)은 이를 표시하고, [상세 화면](lib/ui/screens/detail_screen.dart)은 선택한 ID로 로컬 SQLite의 설명을 조회합니다.
 
-### 1. Firebase 콘솔 설정 (실제 FCM 수신용)
-FCM을 실제 모바일 기기 혹은 에뮬레이터에서 수신하기 위해 콘솔 설정을 진행해야 합니다:
-1. **[Firebase 콘솔](https://console.firebase.google.com/)**에 접속하여 새 프로젝트를 생성합니다.
-2. **Android 앱 추가**: 패키지명 `com.example.landmark_demo_app` 등으로 등록 후 `google-services.json` 파일을 다운로드하여 `android/app/` 경로에 배치합니다.
-3. **iOS 앱 추가**: 번들 ID 등록 후 `GoogleService-Info.plist` 파일을 다운로드하여 `ios/Runner/` 경로에 배치합니다.
-4. **서비스 계정 키 발급**: `프로젝트 설정` -> `서비스 계정` 탭에서 **새 비공개 키 생성** 버튼을 눌러 JSON 파일을 다운로드합니다. 이 파일의 이름을 `firebase-service-account.json`으로 변경한 뒤 `backend/` 폴더 바로 아래에 넣어주세요.
+### 텍스트 검색: 입력 → 의미·키워드 검색 → 결과 화면
 
-### 2. 백엔드 로컬 실행 방법
-```bash
-# 의존성 패키지 설치
+1. [텍스트 검색 화면](lib/ui/screens/text_search_screen.dart)이 검색어를 전달하면 [KeywordSearchService](lib/services/keyword_search_service.dart)가 로컬 DB의 이름·별칭 등에서 키워드 점수를 구합니다.
+2. [TokenizerService](lib/services/tokenizer_service.dart)가 검색어를 77개 토큰으로 변환하고, 텍스트 ONNX 인코더가 512차원 임베딩을 생성합니다.
+3. [SemanticTextSearchService](lib/services/semantic_text_search_service.dart)가 `text_index.json`의 벡터와 비교하고, `text_search_policy.json`의 가중치로 의미 유사도와 키워드 점수를 결합합니다.
+4. 랜드마크별 후보를 정렬하고 판정 상태를 반환합니다. 결과에는 의미 점수, 키워드 점수, 최종 점수와 일치한 텍스트도 포함됩니다.
+
+| 판정 상태 | 의미 |
+| --- | --- |
+| `matched` | 설정한 점수·점수 차이 기준을 충족한 후보 |
+| `ambiguous` | 후보 사이의 구분이 충분하지 않거나 점수가 불확실한 경우 |
+| `out_of_scope` | 검색 정책상 적절한 후보를 제시하기 어려운 경우 |
+| `low_quality` | 이미지 품질 검사에서 재촬영 등이 필요한 경우 |
+
+표시 점수는 유사도 또는 결합 점수이며 **정답 확률이 아닙니다**. `out_of_scope` 판정이 실제 모든 미등록 장소의 거절 성능을 보장하지는 않습니다.
+
+### 저장과 서버 연결
+
+- **로컬 데이터:** [DatabaseHelper](lib/data/database_helper.dart)가 `assets/landmark_info.json`에서 다국어 랜드마크와 별칭을 초기 적재하고 검색 기록을 저장합니다.
+- **모델 파일:** Android의 [MainActivity.kt](android/app/src/main/kotlin/com/example/landmark_demo_app/MainActivity.kt)가 `manifest.json`을 읽고 ONNX·외부 가중치 파일을 앱 내부 저장소에 복사합니다. Dart는 MethodChannel로 파일 경로를 받아 세션을 생성합니다.
+- **인증:** [AuthController](lib/auth/auth_controller.dart)와 [TokenStorage](lib/auth/token_storage.dart)가 서버 인증과 토큰 보관·복원을 담당합니다.
+- **백엔드:** [backend/app/main.py](backend/app/main.py)가 아래 라우터를 등록합니다. 서버 로그는 검색 결과 표시와 분리해 비동기로 전송합니다.
+
+| API 경로 | 역할 |
+| --- | --- |
+| `/api/auth` | 회원가입·로그인·사용자 조회·탈퇴·FCM 토큰 갱신 |
+| `/api/landmarks` | 서버의 랜드마크 목록 조회 |
+| `/api/suggestions` | 건의 제출·조회와 관리자 상태 변경 |
+| `/api/notifications` | 알림함 조회·읽음 처리·푸시 발송 |
+| `/api/search/logs` | 검색 기록 수집 |
+
+## 현재 연동 모델과 실험 근거
+
+현재 [manifest.json](assets/mobile_artifacts_fp16/manifest.json)에 명시된 앱 연동 사양입니다.
+
+| 항목 | 값 |
+| --- | --- |
+| 모델 | MobileCLIP2-S3 |
+| 모델 ID | `mobileclip2_s3_server_full_ce_hardneg` |
+| 구성 | 이미지·텍스트 인코더를 별도 ONNX 세션으로 로드 |
+| 정밀도 정책 | FP16 혼합 저장, FP32 연산 (`selected_fp16_weight_storage_fp32_compute`) |
+| 이미지 인식 클래스 | 23개 |
+| 임베딩 차원 | 512 |
+| 이미지 입력 / 텍스트 길이 | 224 × 224 / 77 tokens |
+| ONNX opset | 18 |
+| 앱 추론 경로 | ONNX Runtime 기본 CPU 경로 |
+
+모델 이름만으로 연동 여부를 판단하지 않습니다. 전처리, 클래스 순서, 대표 벡터, tokenizer, 텍스트 인덱스와 판정 정책이 같은 모델 묶음에 대응해야 합니다. 필요한 파일은 [모델 파일 안내](assets/mobile_artifacts_fp16/README.txt)와 [검사 스크립트](scripts/check_model_contract.py)에서 확인할 수 있습니다.
+
+- **[모델 실험·선정 저장소](https://github.com/HyunKN/ondevice-landmark-assistant):** 학습·평가·배포 실험의 전체 맥락
+- **[Sprint 2 실험 비교 결과](https://landmark-assistant-sprint1.vercel.app/experiments/paper/sprint2-main-matrix-results-2026-06-15.html):** 후보 구성, 평가 기준과 결과
+- **[모델 Serving Contract](https://landmark-assistant-sprint1.vercel.app/operations/model-serving-contract.html):** 모델 입출력, 전처리, 파일 구성과 연동 규칙
+- **[Flutter 온디바이스 아키텍처 기록](https://landmark-assistant-sprint1.vercel.app/operations/flutter-ondevice-app-architecture.html):** 앱 연동 설계와 기술 기록
+
+실험 결과는 해당 데이터셋과 평가 조건의 결과입니다. 이 README의 현재 모델 표는 App의 manifest를 기준으로 하며, 실험 순위와 앱에 실제 탑재한 모델은 구분해서 확인합니다.
+
+## 코드 구조
+
+```text
+lib/
+  main.dart            서비스 생성과 앱 진입점
+  api/                 로컬 검색 조합, 서버 HTTP 통신, 다국어 문구
+  services/            ONNX 추론, 이미지 품질, tokenizer, 검색, 푸시
+  data/                SQLite와 기능별 Repository
+  auth/                인증 상태, 화면 접근, 보안 토큰 저장
+  ui/screens/          홈, 검색 결과, 상세, 계정, 건의, 알림, 관리자 화면
+assets/
+  mobile_artifacts_fp16/ 모델 메타데이터·인덱스 및 별도 제공받는 ONNX 파일
+  landmark_info.json   랜드마크 설명과 별칭
+  hero_images/         랜드마크 표시 이미지
+android/               Android 빌드 설정과 모델 파일 준비 코드
+backend/               FastAPI 라우터, 데이터 모델, 데이터 적재
+scripts/               모델 연동 검사와 텍스트 검색 산출물 생성
+test/                  점수 정책, tokenizer, 텍스트 인덱스 테스트
+```
+
+루트의 `pubspec.yaml`을 기준으로 앱을 실행합니다. `emulate/`에는 별도 Flutter 프로젝트가 있으므로 위 앱과 혼동하지 않도록 합니다.
+
+## 개발 환경과 실행
+
+### 1. 저장소와 도구 준비
+
+Flutter SDK, Android SDK, JDK 17, Python을 준비합니다. 현재 Android 설정은 `compileSdk 35`, `NDK 27.0.12077973`이며, Dart SDK 범위는 [pubspec.yaml](pubspec.yaml)에 선언되어 있습니다. Flutter SDK의 정확한 버전은 저장소에 고정되어 있지 않습니다.
+
+```powershell
+git clone https://github.com/lpcvc-2026-CNU/App.git
+cd App
+flutter doctor
+flutter pub get
+```
+
+### 2. 모델과 Firebase 설정 준비
+
+`.onnx`와 `.onnx.data` 파일은 [.gitignore](.gitignore)에 의해 제외되어 있어 **clone만으로 모델이 준비되지는 않습니다**. 팀에서 제공하는 현재 manifest에 대응하는 모델 묶음을 받아 `assets/mobile_artifacts_fp16/`에 배치합니다. 이미지·텍스트 인코더 각각의 ONNX와 외부 가중치 파일이 모두 필요합니다. 이 README에는 아직 모델 묶음의 공개 다운로드 URL이 지정되어 있지 않습니다.
+
+Android 빌드에는 프로젝트에 맞는 `android/app/google-services.json`도 준비합니다. 현재 application ID는 `com.example.landmark_demo_app`이며, Gradle에 Google Services 플러그인이 적용되어 있습니다. 런타임 Firebase 초기화 실패 시의 Mock 동작과 빌드 설정 파일 준비는 별개의 단계입니다.
+
+실제 푸시 발송은 백엔드의 `backend/firebase-service-account.json`과 Firebase 설정이 필요합니다. 서버 서비스 계정 키는 비공개로 관리하고 Git에 커밋하지 않습니다. 백엔드에 이 파일이 없으면 실제 푸시 대신 Mock 로그를 사용합니다.
+
+### 3. 백엔드 실행
+
+아래는 **새 로컬 개발용 SQLite DB**를 사용하는 PowerShell 예시입니다. `migrate_landmarks.py`는 기존 랜드마크를 삭제하고 다시 적재하므로 기존 운영 DB에 실행하지 않습니다.
+
+```powershell
 cd backend
-pip install -r requirements.txt
-
-# 데이터 마스터 마이그레이션 (25종 랜드마크 적재 및 search_logs 테이블 DDL 생성)
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+$env:DATABASE_URL = "sqlite:///./landmark-dev.db"
 .\.venv\Scripts\python.exe migrate_landmarks.py
-
-# uvicorn 서버 구동 (기본 포트 8000, 실기기 연동을 위해 0.0.0.0 바인딩 권장)
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 3. 클라이언트 로컬 실행 방법 (에뮬레이터 & 실기기)
-* **Android 에뮬레이터에서 실행할 경우**:
-  ```bash
-  flutter run
-  ```
-  *(에뮬레이터 환경에서는 기본적으로 `http://10.0.2.2:8000` 호스트 게이트웨이로 서버에 접속합니다.)*
+이 터미널을 유지하고 [로컬 API 문서](http://localhost:8000/docs)에서 서버를 확인합니다. 관리자 건의 처리는 서버에서 `is_admin` 권한이 부여된 계정이 필요합니다.
 
-* **실제 Android 스마트폰 기기에서 실행할 경우 (추천 ⭐)**:
-  실기기에서는 에뮬레이터용 가상 IP(`10.0.2.2`)가 동작하지 않으므로, **포트 역포워딩(ADB Reverse)** 설정을 통해 USB 디버깅 통로로 PC 백엔드에 신호를 넘겨주어야 합니다.
-  1. PC의 PowerShell 창에서 아래 명령어로 8000번 포트 터널을 개방합니다:
-     ```powershell
-     & C:\Users\user\AppData\Local\Android\Sdk\platform-tools\adb.exe reverse tcp:8000 tcp:8000
-     ```
-  2. 다음 명령어로 `localhost` 주소를 명시적으로 주입하며 앱을 실행합니다:
-     ```bash
-     flutter run --dart-define=BACKEND_URL=http://localhost:8000
-     ```
-  *(실제 기기 빌드 시 `ArgMax(13)` 노드 결핍으로 인한 모델 로딩 실패를 차단하기 위해 `onnxruntime-android:1.16.0` Full 바이너리가 자동으로 컴파일 패키징됩니다.)*
+### 4. Android 앱 실행
 
-### 4. 관리자(Admin) 계정 승격 및 관리자 페이지 테스트 방법
-앱 내의 건의 관리 및 승인/반려 시 실시간 푸시 발송 트리거를 테스트하려면 관리자 계정이 필요합니다.
-1. 스마트폰 앱에서 사용하려는 이메일 주소(예: `admin@test.com`)로 **회원가입**을 진행합니다.
-2. 가입에 성공하면, PC 터미널에서 다음 스크립트를 실행해 데이터베이스 상에서 해당 계정을 즉시 관리자로 승격시킵니다:
-   ```powershell
-   # 가입된 이메일을 승격 (기본 이메일: admin@test.com)
-   .\.venv\Scripts\python.exe C:\Users\user\.gemini\antigravity\brain\456de5ea-3e27-41c1-96fd-506187831536\scratch\promote_admin.py
+새 터미널을 열고 **저장소 루트**에서 실행합니다.
 
-   # 만약 임의의 다른 이메일(예: your_email@domain.com)로 가입하여 승격하고 싶다면 이메일 기재
-   .\.venv\Scripts\python.exe C:\Users\user\.gemini\antigravity\brain\456de5ea-3e27-41c1-96fd-506187831536\scratch\promote_admin.py your_email@domain.com
-   ```
-3. 승격 완료 후 해당 이메일로 앱에 다시 로그인하면 메인 화면 우측 상단에 **관리자 기능(톱니바퀴 등) 진입 아이콘**이 생기며, 유저들이 등록한 건의 목록을 조회하고 승인/반려 처리를 수행할 수 있습니다.
+Android 에뮬레이터:
 
-### 5. Sprint 2 백엔드 및 DB 주요 변경 사항
-* **검색 로그 테이블 스키마 구축 (`search_logs`)**:
-  * 모바일 로컬 SQLite 및 서버 DB에 검색 이력에 관한 디버깅 확장 필드(`model_version`, `backend`, `top3_scores`, `margin`, `decision_status`, `latency_ms`)가 동일하게 설계되어 적재됩니다.
-* **검색 로그 수집 API 추가**:
-  * `POST /api/search/logs`: 모바일 앱에서 검색 성공/실패 시 비동기 백그라운드 요청을 통해 서버 데이터베이스에도 상세한 검색 로그 정보를 자동 업로드 및 수집합니다.
+```powershell
+flutter run --dart-define=BACKEND_URL=http://10.0.2.2:8000
+```
+
+USB로 연결한 Android 실기기:
+
+```powershell
+adb reverse tcp:8000 tcp:8000
+flutter run --dart-define=BACKEND_URL=http://localhost:8000
+```
+
+`adb`는 Android SDK의 `platform-tools`가 PATH에 등록되어 있어야 합니다. 서버 주소는 [BackendConfig](lib/api/backend_config.dart)의 `BACKEND_URL`로 주입합니다. 모델 준비와 세션 초기화가 완료된 뒤 회원가입·로그인, 사진 검색, 텍스트 검색, 상세 정보 표시를 확인합니다.
+
+## 검증과 현재 제한
+
+저장소 루트에서 실행하는 검사 명령입니다. 아래 명령의 존재는 최신 환경에서 통과했다는 의미가 아니며, 변경 후 직접 실행해 결과를 확인해야 합니다.
+
+```powershell
+flutter analyze
+flutter test
+python scripts/check_model_contract.py
+python -m unittest discover -s scripts -p "test_model_integration_contract.py" -v
+```
+
+| 검사 | 확인하는 범위 |
+| --- | --- |
+| `flutter analyze` | Dart 정적 분석 |
+| `flutter test` | 판정 정책, tokenizer fixture, 텍스트 인덱스 등 |
+| `check_model_contract.py` | 필요한 모델 파일, 메타데이터, 클래스·인덱스·카탈로그 정합성 |
+| `test_model_integration_contract.py` | 모델 묶음·스키마와 코드 연결에 대한 검사 |
+
+Python 모델 검사는 별도로 받은 ONNX·외부 가중치 파일이 있어야 합니다. `test/widget_test.dart`는 현재 placeholder이므로 실제 화면 동작 검증으로 보지 않습니다. 위 검사는 Android에서의 모델 로딩·검색·메모리·지연 시간 측정을 대체하지 않습니다.
+
+- **지원 범위:** 이미지 인식은 등록된 23개 클래스 기준입니다. 미등록 장소와 다양한 현장 조건에서의 성능은 별도 검증이 필요합니다.
+- **플랫폼:** 이 실행 안내는 Android 기준입니다. iOS·웹·데스크톱 폴더의 존재가 동일한 모델 경로의 동작 검증을 뜻하지는 않습니다.
+- **초기화:** 모델 파일 복사와 이미지·텍스트 세션 초기화가 필요합니다. 최초 실행 시간과 메모리는 기기에서 확인해야 합니다.
+- **배포:** 현재 [Android release 설정](android/app/build.gradle.kts)은 debug 서명을 사용합니다. 정식 배포 전에 application ID, 배포 서명, 서버 주소와 모델 묶음 크기를 확인해야 합니다.
+- **배포본 확인:** [GitHub Releases](https://github.com/lpcvc-2026-CNU/App/releases)에서 배포본을 확인할 수 있습니다. 2026-10-29 확인 기준으로 등록된 Release와 GitHub Actions workflow는 없습니다.
+
+<a id="license"></a>
+
+## 라이선스
+
+프로젝트에서 작성한 소스 코드와 문서는 **[MIT License](LICENSE)**로 제공합니다. 외부 라이브러리, 사전학습 모델·가중치, 데이터셋과 이미지 등 제3자 자료는 각 원저작자의 라이선스와 이용 조건을 따릅니다.
